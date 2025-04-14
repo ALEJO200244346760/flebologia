@@ -14,13 +14,18 @@ function Header() {
     navigate('/login')
   }
 
+  const handleHomeClick = () => {
+    navigate('/')
+  }
+
   return (
     <header className="fixed top-0 left-0 w-full z-10 bg-gradient-to-r from-blue-400 to-blue-600 p-4">
       <div className="flex justify-between items-center">
         {/* Lado izquierdo - Título */}
         <div className="text-white font-extrabold text-3xl flex items-center">
+          <button onClick={handleHomeClick}>
           <span>FLEBOLOGÍA</span>
-          <span className="text-sm text-white ml-2">online</span>
+          <span className="text-sm text-white ml-2">online</span></button>
         </div>
 
         {/* Lado derecho - Botones */}
