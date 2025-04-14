@@ -72,7 +72,7 @@ public class SecurityConfig {
         // Configuración de CORS
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // Origen permitido
+        config.setAllowedOrigins(List.of("https://flebologia.vercel.app/")); // Origen permitido
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // Métodos permitidos
         config.setAllowedHeaders(List.of("Authorization", "Content-Type")); // Cabeceras permitidas
         config.setAllowCredentials(true); // Permitir credenciales (cookies, etc.)

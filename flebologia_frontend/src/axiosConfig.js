@@ -9,7 +9,7 @@ const getToken = () => {
 
 // Crear instancia de axios con configuración base
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080', // asegurate que no termine en /
+    baseURL: 'flebologia.railway.internal', // asegurate que no termine en /
     headers: {
       'Content-Type': 'application/json',
     },
