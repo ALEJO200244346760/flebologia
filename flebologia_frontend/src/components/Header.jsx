@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext' // Ajustá el path si es necesario
 
 function Header() {
   const navigate = useNavigate()
-  const [user, setUser] = useState(null)
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-  }, [])
+  const { user, logout, token } = useAuth()
 
   const handleContactClick = () => {
     navigate('/contact')
@@ -21,8 +15,7 @@ function Header() {
   }
 
   const handleLogoutClick = () => {
-    localStorage.removeItem('user')
-    setUser(null)
+    logout()
     navigate('/')
   }
 
@@ -50,10 +43,10 @@ function Header() {
             Contacto
           </button>
 
-          {user ? (
+          {token ? (
             <>
               <span className="text-white font-semibold text-lg">
-                ¡Hola, {user.name}!
+                ¡Hola, {user.nombre}!
               </span>
               <button
                 onClick={handleLogoutClick}
