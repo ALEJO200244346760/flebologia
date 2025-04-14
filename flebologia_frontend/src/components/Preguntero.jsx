@@ -97,7 +97,7 @@ function Preguntero() {
 
         <div className="flex-1 text-center">
           <img
-            src="ruta/a/tu/imagen-del-medico.jpg"
+            src="public/doctor.jpg"
             alt="Doctor"
             className="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-white"
           />
