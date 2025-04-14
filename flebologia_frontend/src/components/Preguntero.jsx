@@ -96,11 +96,11 @@ function Preguntero() {
         </div>
 
         <div className="flex-1 text-center">
-          <img
-            src="public/doctor.jpg"
-            alt="Doctor"
-            className="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-white"
-          />
+        <img
+          src="/doctor.jpg"
+          alt="Doctor"
+          className="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-white"
+        />
         </div>
 
       </div>
