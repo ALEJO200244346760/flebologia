@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../axiosConfig'; // Importa la instancia de Axios
 
 function Login() {
@@ -9,17 +9,17 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Iniciando sesión con:', { email, password }); // Agregado para depuración
+    console.log('Iniciando sesión con:', { email, password });
+
     try {
-      const res = await axiosInstance.post('/api/users/login', { email, password }); // Usar la instancia de Axios configurada
-      console.log('Respuesta del servidor:', res); // Agregado para depuración
-      localStorage.setItem('token', res.data.token); // Almacena el token en el almacenamiento local
-      navigate('/'); // Redirige al inicio después del login exitoso
+      const res = await axiosInstance.post('/api/users/login', { email, password });
+      console.log('Respuesta del servidor:', res);
+      localStorage.setItem('token', res.data.token);
+      navigate('/chat'); // ✅ Redirige al chat del doctor después del login
     } catch (error) {
-      // Agregado para mejorar el manejo de errores
       if (error.response) {
         console.error('Respuesta del error:', error.response.data);
-        alert('Error en login: ' + error.response.data); // Muestra el error del backend
+        alert('Error en login: ' + error.response.data);
       } else {
         console.error('Error en la solicitud:', error);
         alert('Error desconocido al intentar iniciar sesión');
@@ -50,6 +50,14 @@ function Login() {
             Iniciar Sesión
           </button>
         </form>
+
+        {/* ✅ Texto y enlace de registro */}
+        <p className="mt-4 text-center text-sm text-gray-600">
+          ¿No tienes cuenta?{' '}
+          <Link to="/registro" className="text-blue-500 hover:underline">
+            Registrarse
+          </Link>
+        </p>
       </div>
     </div>
   );
