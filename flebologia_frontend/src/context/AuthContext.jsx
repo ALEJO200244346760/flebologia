@@ -61,4 +61,3 @@ export const AuthProvider = ({ children }) => {
 
 // Exportar el contexto y un hook personalizado para acceder a los valores
 export { AuthContext };
-export const useAuth = () => useContext(AuthContext);

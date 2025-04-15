@@ -1,10 +1,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext' // Ajustá el path si es necesario
+import useAuth from '../hooks/useAuth';
 
 function Header() {
   const navigate = useNavigate()
-  const { user, logout, token } = useAuth()
+  const { user, logout, token } = useAuth() || {};
 
   const handleContactClick = () => {
     navigate('/contact')
