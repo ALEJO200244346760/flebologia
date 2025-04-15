@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Preguntero from './components/Preguntero';
 import Login from './pages/Login';
 import Header from './components/Header';
-import Chat from './pages/Chat'; // Asegúrate de tener esta página
+import Chat from './pages/ChatPage'; // Asegúrate de tener esta página
 import Registro from './pages/Registro';
 import { AuthProvider } from './context/AuthContext'; // Proveedor de autenticación
 
