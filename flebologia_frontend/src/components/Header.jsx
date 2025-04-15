@@ -1,27 +1,28 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import useAuth from '../hooks/useAuth';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth'; // ✅ Import corregido
 
 function Header() {
-  const navigate = useNavigate()
-  const { user, logout, token } = useAuth() || {};
+  const navigate = useNavigate();
+  const auth = useAuth() || {}; // ✅ Protección en caso de que el contexto esté vacío
+  const { user = {}, logout, token } = auth;
 
   const handleContactClick = () => {
-    navigate('/contact')
-  }
+    navigate('/contact');
+  };
 
   const handleLoginClick = () => {
-    navigate('/login')
-  }
+    navigate('/login');
+  };
 
   const handleLogoutClick = () => {
-    logout()
-    navigate('/')
-  }
+    logout?.(); // ✅ Llama a logout solo si existe
+    navigate('/');
+  };
 
   const handleHomeClick = () => {
-    navigate('/')
-  }
+    navigate('/');
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full z-10 bg-gradient-to-r from-blue-400 to-blue-600 p-4">
@@ -46,7 +47,7 @@ function Header() {
           {token ? (
             <>
               <span className="text-white font-semibold text-lg">
-                ¡Hola, {user.nombre}!
+                ¡Hola, {user.nombre || 'Usuario'}!
               </span>
               <button
                 onClick={handleLogoutClick}
@@ -66,7 +67,7 @@ function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
 
-export default Header
+export default Header;
