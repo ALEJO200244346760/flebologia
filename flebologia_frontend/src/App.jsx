@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Header from './components/Header';
 import Chat from './pages/ChatPage'; // Asegúrate de tener esta página
 import Registro from './pages/Registro';
+import Cobrar from './components/Cobrar'
 import { AuthProvider } from './context/AuthContext'; // Proveedor de autenticación
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
 
           {/* ✅ Página principal accesible para todos */}
           <Route path="/" element={<Preguntero />} />
+          <Route path="/pago" element={<Cobrar />} />
           <Route path="/chat" element={<Chat />} />
         </Routes>
       </Router>

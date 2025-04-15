@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axiosInstance from '../axiosConfig'; // Importa la instancia de Axios
+import axiosInstance from '../axiosConfig';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -13,9 +13,28 @@ function Login() {
 
     try {
       const res = await axiosInstance.post('/api/users/login', { email, password });
+      const token = res.data.token;
       console.log('Respuesta del servidor:', res);
-      localStorage.setItem('token', res.data.token);
-      navigate('/chat'); // ✅ Redirige al chat del doctor después del login
+
+      localStorage.setItem('token', token);
+
+      // ✅ Verificamos si ya pagó
+      try {
+        const checkPago = await axiosInstance.get('/api/chat', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (checkPago.status === 200) {
+          navigate('/chat'); // ✅ Ya pagó → al chat
+        }
+      } catch (error) {
+        if (error.response?.status === 403) {
+          navigate('/pago'); // ❌ No pagó → al pago
+        } else {
+          console.error('Error verificando pago:', error);
+          alert('Error inesperado al verificar el estado de pago');
+        }
+      }
     } catch (error) {
       if (error.response) {
         console.error('Respuesta del error:', error.response.data);
@@ -51,7 +70,7 @@ function Login() {
           </button>
         </form>
 
-        {/* ✅ Texto y enlace de registro */}
+        {/* ✅ Enlace a registro */}
         <p className="mt-4 text-center text-sm text-gray-600">
           ¿No tienes cuenta?{' '}
           <Link to="/registro" className="text-blue-500 hover:underline">
