@@ -1,5 +1,5 @@
 import React from 'react';
-import ChatForm from '../components/ChatForms';
+import ChatForm from '../components/ChatForm';
 import ChatMessages from '../components/ChatMessages';
 
 const ChatPage = () => {
