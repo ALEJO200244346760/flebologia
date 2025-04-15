@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth'; // ✅ Import corregido
+import useAuth from '../hooks/useAuth';
 
 function Header() {
   const navigate = useNavigate();
-  const auth = useAuth() || {}; // ✅ Protección en caso de que el contexto esté vacío
+  const auth = useAuth() || {};
   const { user = {}, logout, token } = auth;
 
   const handleContactClick = () => {
@@ -16,12 +16,20 @@ function Header() {
   };
 
   const handleLogoutClick = () => {
-    logout?.(); // ✅ Llama a logout solo si existe
+    logout?.();
     navigate('/');
   };
 
   const handleHomeClick = () => {
     navigate('/');
+  };
+
+  // Obtener iniciales del usuario para el circulito
+  const getInitials = (name = '', last = '') => {
+    return (
+      (name?.charAt(0) || '').toUpperCase() +
+      (last?.charAt(0) || '').toUpperCase()
+    );
   };
 
   return (
@@ -46,9 +54,10 @@ function Header() {
 
           {token ? (
             <>
-              <span className="text-white font-semibold text-lg">
-                ¡Hola, {user.nombre || 'Usuario'}!
-              </span>
+              {/* Avatar del usuario */}
+              <div className="w-10 h-10 bg-white text-blue-600 font-bold rounded-full flex items-center justify-center shadow-lg">
+                {getInitials(user.nombre, user.apellido)}
+              </div>
               <button
                 onClick={handleLogoutClick}
                 className="px-6 py-2 text-xl font-bold text-red-500 bg-white rounded-lg shadow-lg hover:bg-red-100 transition-all duration-300 ease-in-out"
