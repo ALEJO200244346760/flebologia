@@ -50,7 +50,7 @@ public class PaymentController {
 
             // Crear back URLs
             PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                    .success("https://flebologia.vercel.app/chat")
+                    .success("https://flebologia.vercel.app/pago-exitoso")
                     .failure("https://flebologia.vercel.app/failure")
                     .pending("https://flebologia.vercel.app/pending")
                     .build();
