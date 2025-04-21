@@ -32,7 +32,7 @@ const ChatForm = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:8080/api/chat/send',
+                'https://flebologia-production.up.railway.app/api/chat/send',
                 formData,
                 { headers: { 'Content-Type': 'multipart/form-data' } }
             );

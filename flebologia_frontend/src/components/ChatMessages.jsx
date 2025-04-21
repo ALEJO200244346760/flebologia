@@ -6,7 +6,7 @@ const ChatMessages = () => {
 
     const fetchMessages = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/chat/mensajes');
+            const response = await axios.get('https://flebologia-production.up.railway.app/api/chat/mensajes');
             setMessages(response.data);
         } catch (error) {
             console.error('Error al cargar mensajes:', error);
