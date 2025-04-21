@@ -30,7 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        if (path.equals("/api/users/register") || path.equals("/api/users/login") || path.startsWith("/api/payment")) {
+        if (path.equals("/api/users/register") || path.equals("/api/users/login") || path.equals("/api/payment/webhook")) {
             filterChain.doFilter(request, response);
             return;
         }
