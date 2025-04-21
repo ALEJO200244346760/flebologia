@@ -39,8 +39,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
-                        .requestMatchers("/api/payment/create_preference").authenticated()
                         .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers("/api/payment/webhook").permitAll() // solo este sin auth
+                        .requestMatchers("/api/payment/create_preference").authenticated() // este sí necesita auth
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
