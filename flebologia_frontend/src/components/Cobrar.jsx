@@ -15,14 +15,23 @@ const Cobrar = () => {
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setPreferenceId(response.data.init_point);
+  
+        // Verifica que la respuesta tenga el init_point
+        console.log("init_point recibido:", response.data.init_point);
+        
+        if (response.data.init_point) {
+          setPreferenceId(response.data.init_point);
+        } else {
+          console.error('Error: no se recibió el init_point');
+        }
+  
       } catch (error) {
         console.error('Error creando preferencia de pago:', error);
       }
     };
-
+  
     createPreference();
-  }, []);
+  }, []);  
 
   // ✅ Nuevo useEffect para verificar si ya pagó y redirigir
   useEffect(() => {

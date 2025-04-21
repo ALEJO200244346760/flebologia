@@ -50,9 +50,9 @@ public class PaymentController {
 
             // Crear back URLs
             PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                    .success("http://localhost:3000/chat")
-                    .failure("http://localhost:3000/failure")
-                    .pending("http://localhost:3000/pending")
+                    .success("https://flebologia.vercel.app/chat")
+                    .failure("https://flebologia.vercel.app/failure")
+                    .pending("https://flebologia.vercel.app/pending")
                     .build();
 
             // Crear preferencia
