@@ -12,11 +12,18 @@ function Login() {
     console.log('Iniciando sesión con:', { email, password });
 
     try {
+      // Realizamos la solicitud POST para iniciar sesión
       const res = await axiosInstance.post('/api/users/login', { email, password });
-      const token = res.data.token;
+      
+      // Ahora res.data contiene el objeto { token, email, name }
+      const { token, email: userEmail, name: userName } = res.data;
+
       console.log('Respuesta del servidor:', res);
 
+      // Guardamos el token y los datos del usuario en el localStorage
       localStorage.setItem('token', token);
+      localStorage.setItem('userName', userName); // Guardamos el nombre del usuario
+      localStorage.setItem('userEmail', userEmail); // Guardamos el email del usuario
 
       // ✅ Verificamos si ya pagó
       try {

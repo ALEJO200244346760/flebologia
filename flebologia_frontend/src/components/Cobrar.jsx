@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from '../axiosConfig'; // Importa la instancia de Axios configurada
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../axiosConfig';
 
 const Cobrar = () => {
   const [preferenceId, setPreferenceId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const createPreference = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axiosInstance.post(
-          '/api/payment/create_preference', // Usa la URL relativa ya configurada en axiosInstance
+          '/api/payment/create_preference',
           {},
-          { headers: { Authorization: `Bearer ${token}` } } // Autenticación con el token almacenado
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        setPreferenceId(response.data.init_point); // Guarda el punto de inicio de la preferencia de pago
+        setPreferenceId(response.data.init_point);
       } catch (error) {
         console.error('Error creando preferencia de pago:', error);
       }
@@ -23,12 +24,37 @@ const Cobrar = () => {
     createPreference();
   }, []);
 
+  // ✅ Nuevo useEffect para verificar si ya pagó y redirigir
+  useEffect(() => {
+    const checkPago = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axiosInstance.get('/api/chat', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 200) {
+          navigate('/chat');
+        }
+      } catch (error) {
+        // Si aún no pagó, no hacemos nada
+      }
+    };
+
+    const interval = setInterval(checkPago, 3000); // Cada 3 segundos
+    return () => clearInterval(interval);
+  }, [navigate]);
+
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       {preferenceId ? (
-        <a href={preferenceId} className="btn-pago">
-          Pagar con Mercado Pago
-        </a>
+        <>
+          <h2 className="mb-4 text-xl font-semibold">Para acceder al chat con el doctor, realiza el pago:</h2>
+          <a href={preferenceId} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Pagar con Mercado Pago
+          </a>
+          <p className="mt-4 text-sm text-gray-600">Una vez confirmado el pago, serás redirigido automáticamente al chat.</p>
+        </>
       ) : (
         <p>Cargando pago...</p>
       )}
