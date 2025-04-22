@@ -1,29 +1,28 @@
+// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
+import useAuth from '../hooks/useAuth'; // ✅ Importar el hook del contexto
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ Usar login del contexto
 
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log('Iniciando sesión con:', { email, password });
 
     try {
-      // Realizamos la solicitud POST para iniciar sesión
       const res = await axiosInstance.post('/api/users/login', { email, password });
-      
-      // Ahora res.data contiene el objeto { token, email, name }
-      const { token, email: userEmail, name: userName } = res.data;
+
+      const { token } = res.data;
 
       console.log('Respuesta del servidor:', res);
 
-      // Guardamos el token y los datos del usuario en el localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('userName', userName); // Guardamos el nombre del usuario
-      localStorage.setItem('userEmail', userEmail); // Guardamos el email del usuario
+      // ✅ Usar login del contexto para actualizar el estado global
+      login(token); // 👈 Esto hace todo: setToken, setUser y re-render
 
       // ✅ Verificamos si ya pagó
       try {
@@ -32,11 +31,11 @@ function Login() {
         });
 
         if (checkPago.status === 200) {
-          navigate('/chat'); // ✅ Ya pagó → al chat
+          navigate('/chat');
         }
       } catch (error) {
         if (error.response?.status === 403) {
-          navigate('/pago'); // ❌ No pagó → al pago
+          navigate('/pago');
         } else {
           console.error('Error verificando pago:', error);
           alert('Error inesperado al verificar el estado de pago');
@@ -77,7 +76,6 @@ function Login() {
           </button>
         </form>
 
-        {/* ✅ Enlace a registro */}
         <p className="mt-4 text-center text-sm text-gray-600">
           ¿No tienes cuenta?{' '}
           <Link to="/registro" className="text-blue-500 hover:underline">
