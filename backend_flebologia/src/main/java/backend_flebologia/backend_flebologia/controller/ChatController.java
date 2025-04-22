@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +23,10 @@ public class ChatController {
 
     @GetMapping
     public ResponseEntity<String> enterChat(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(401).body("No estás autenticado");
+        }
+
         if (paymentService.hasUserPaid(user)) {
             return ResponseEntity.ok("Bienvenido al chat con el Dr. Jorja");
         } else {
@@ -37,6 +40,10 @@ public class ChatController {
             @RequestBody Map<String, String> payload,
             @AuthenticationPrincipal User user
     ) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(null); // Cambié a 'null' para hacer coincidir el tipo
+        }
+
         if (!paymentService.hasUserPaid(user)) {
             return ResponseEntity.status(403).build();
         }
@@ -46,16 +53,20 @@ public class ChatController {
         String mediaUrl = payload.get("mediaUrl");
 
         ChatMessage savedMessage = chatMessageService.saveMessage(content, type, mediaUrl, user);
-        return ResponseEntity.ok(savedMessage);
+        return ResponseEntity.ok(savedMessage); // Aquí se devuelve el tipo correcto
     }
 
     // 📩 Obtener mensajes del usuario
     @GetMapping("/mensajes")
     public ResponseEntity<List<ChatMessage>> getMensajes(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(null); // Cambié a 'null' para hacer coincidir el tipo
+        }
+
         if (!paymentService.hasUserPaid(user)) {
             return ResponseEntity.status(403).build();
         }
-        return ResponseEntity.ok(chatMessageService.getMessagesForUser(user));
+        return ResponseEntity.ok(chatMessageService.getMessagesForUser(user)); // Se devuelve el tipo correcto
     }
 
     @PostMapping("/send")
@@ -66,6 +77,10 @@ public class ChatController {
             @RequestParam(value = "media", required = false) MultipartFile mediaFile
     ) {
         try {
+            if (user == null) {
+                return ResponseEntity.status(401).body("No estás autenticado");
+            }
+
             if (!paymentService.hasUserPaid(user)) {
                 return ResponseEntity.status(403).body("Debes pagar para enviar mensajes.");
             }
@@ -83,5 +98,4 @@ public class ChatController {
             return ResponseEntity.status(500).body("Error al enviar el mensaje: " + e.getMessage());
         }
     }
-
 }
