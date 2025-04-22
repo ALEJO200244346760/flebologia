@@ -1,9 +1,10 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+// src/context/AuthContext.js
+import { createContext, useState, useEffect } from 'react';
 
 // Crear el contexto
 const AuthContext = createContext();
 
-// Decodificar el token JWT
+// Función para decodificar el token JWT
 const decodeToken = (token) => {
   try {
     const payload = token.split('.')[1];
@@ -15,41 +16,39 @@ const decodeToken = (token) => {
   }
 };
 
-// Componente proveedor del contexto
+// Proveedor del contexto de autenticación
 export const AuthProvider = ({ children }) => {
-  // Estado para el token y el usuario
   const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const [user, setUser] = useState({ nombre: '', apellido: '' });
+  const [user, setUser] = useState({ nombre: '', apellido: '', email: '' });
 
-  // Efecto para leer el token cuando se carga el componente
   useEffect(() => {
     if (token) {
       const decodedToken = decodeToken(token);
       setUser({
         nombre: decodedToken?.nombre || '',
         apellido: decodedToken?.apellido || '',
+        email: decodedToken?.email || '', // ✅ agregado
       });
     } else {
-      setUser({ nombre: '', apellido: '' });
+      setUser({ nombre: '', apellido: '', email: '' });
     }
   }, [token]);
 
-  // Función de login
   const login = (newToken) => {
-    localStorage.setItem('token', newToken);  // Guardamos el token en localStorage
+    localStorage.setItem('token', newToken);
     setToken(newToken);
     const decodedToken = decodeToken(newToken);
     setUser({
       nombre: decodedToken?.nombre || '',
       apellido: decodedToken?.apellido || '',
+      email: decodedToken?.email || '', // ✅ agregado
     });
   };
 
-  // Función de logout
   const logout = () => {
-    localStorage.removeItem('token');  // Eliminamos el token de localStorage
+    localStorage.removeItem('token');
     setToken(null);
-    setUser({ nombre: '', apellido: '' });
+    setUser({ nombre: '', apellido: '', email: '' });
   };
 
   return (
@@ -59,5 +58,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Exportar el contexto y un hook personalizado para acceder a los valores
 export { AuthContext };
