@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../axiosConfig'; // Importa la instancia de Axios
+import axiosInstance from '../axiosConfig';
 import Cobrar from './Cobrar';
 
 function Preguntero() {
@@ -9,11 +9,10 @@ function Preguntero() {
   const [loading, setLoading] = useState(true);
   const [hasPaid, setHasPaid] = useState(false);
 
-  // Verificar usuario y si ha pagado
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      axiosInstance.get('/api/users/me') // Usa la instancia de Axios configurada
+      axiosInstance.get('/api/users/me')
         .then((res) => {
           setUser(res.data);
           checkPaymentStatus();
@@ -27,10 +26,9 @@ function Preguntero() {
     }
   }, []);
 
-  // Verificar si el usuario ya ha pagado
   const checkPaymentStatus = async () => {
     try {
-      const res = await axiosInstance.get('/api/payment/status'); // Usa la instancia de Axios configurada
+      const res = await axiosInstance.get('/api/payment/status');
       setHasPaid(res.data.hasPaid);
       setLoading(false);
     } catch (error) {
@@ -39,7 +37,6 @@ function Preguntero() {
     }
   };
 
-  // Intentar entrar al chat
   const handleEnterChat = () => {
     if (hasPaid) {
       navigate('/chat');
@@ -49,12 +46,22 @@ function Preguntero() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-blue-600 p-0 m-0">
-      <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-full flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-8">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-blue-600 p-4">
+      <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-5xl flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-8">
 
+        {/* Imagen del doctor - Mostrar primero en móvil */}
+        <div className="flex md:hidden justify-center">
+          <img
+            src="/doctor.jpg"
+            alt="Doctor"
+            className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-full shadow-lg border-4 border-white"
+          />
+        </div>
+
+        {/* Sección Preguntas */}
         <div className="flex-1 text-center md:text-left">
-          <h2 className="text-4xl font-extrabold text-gray-800 mb-4">Preguntas Frecuentes</h2>
-          <ul className="text-lg text-gray-600 space-y-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">Preguntas Frecuentes</h2>
+          <ul className="text-base sm:text-lg text-gray-600 space-y-3">
             <li>¿Qué es la flebología?</li>
             <li>¿Cuáles son los síntomas más comunes?</li>
             <li>¿Qué tratamientos existen para la flebología?</li>
@@ -63,14 +70,15 @@ function Preguntero() {
           </ul>
         </div>
 
-        <div className="flex-shrink-0">
+        {/* Botones / Cobro */}
+        <div className="w-full md:w-auto flex flex-col items-center space-y-4">
           {loading ? (
             <p>Cargando...</p>
           ) : user ? (
             hasPaid ? (
               <button
                 onClick={handleEnterChat}
-                className="px-8 py-4 text-xl font-bold text-white bg-green-500 rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 ease-in-out"
+                className="px-6 py-3 text-lg sm:text-xl font-bold text-white bg-green-500 rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300"
               >
                 Ir al Chat
               </button>
@@ -78,16 +86,16 @@ function Preguntero() {
               <Cobrar />
             )
           ) : (
-            <div>
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={() => navigate('/login')}
-                className="px-8 py-4 text-xl font-bold text-white bg-blue-500 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300 ease-in-out mr-2"
+                className="px-6 py-3 text-lg font-bold text-white bg-blue-500 rounded-lg shadow-lg hover:bg-blue-600 transition-all duration-300"
               >
                 Iniciar Sesión
               </button>
               <button
                 onClick={() => navigate('/registro')}
-                className="px-8 py-4 text-xl font-bold text-white bg-gray-500 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300 ease-in-out"
+                className="px-6 py-3 text-lg font-bold text-white bg-gray-500 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300"
               >
                 Registrarse
               </button>
@@ -95,12 +103,13 @@ function Preguntero() {
           )}
         </div>
 
-        <div className="flex-1 text-center">
-        <img
-          src="/doctor.jpg"
-          alt="Doctor"
-          className="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-white"
-        />
+        {/* Imagen Doctor - Oculta en móvil, visible en desktop */}
+        <div className="hidden md:flex md:flex-1 justify-center">
+          <img
+            src="/doctor.jpg"
+            alt="Doctor"
+            className="w-48 h-48 object-cover rounded-full shadow-lg border-4 border-white"
+          />
         </div>
 
       </div>
