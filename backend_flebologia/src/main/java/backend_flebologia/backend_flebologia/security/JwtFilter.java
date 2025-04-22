@@ -30,6 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
+        // Si la ruta no necesita autenticación, dejamos que pase
         if (path.equals("/api/users/register") || path.equals("/api/users/login") || path.equals("/api/payment/webhook")) {
             filterChain.doFilter(request, response);
             return;
@@ -40,13 +41,25 @@ public class JwtFilter extends OncePerRequestFilter {
         String jwt = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            email = jwtUtil.extractUsername(jwt);
+            jwt = authHeader.substring(7);  // Extraemos el token
+            email = jwtUtil.extractUsername(jwt);  // Extraemos el email del token
+        }
+
+        // Agregamos logs para verificar el flujo
+        if (authHeader == null) {
+            System.out.println("❌ No Authorization header");
+        } else if (!authHeader.startsWith("Bearer ")) {
+            System.out.println("❌ Authorization no empieza con 'Bearer '");
+        } else {
+            System.out.println("🔐 JWT recibido: " + jwt);
+            System.out.println("📧 Usuario del token: " + email);
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // Cargamos los detalles del usuario
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
+            // Validamos el token
             if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
@@ -56,10 +69,15 @@ public class JwtFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
+                // Establecemos la autenticación en el contexto
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("✅ Autenticación exitosa");
+            } else {
+                System.out.println("❌ Token inválido");
             }
         }
 
+        // Continuamos con el filtro
         filterChain.doFilter(request, response);
     }
 }
