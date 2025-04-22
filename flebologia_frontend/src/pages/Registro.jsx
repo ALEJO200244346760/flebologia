@@ -1,24 +1,24 @@
+// src/pages/Registro.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../axiosConfig'; // Importa la instancia de Axios configurada
+import axiosInstance from '../axiosConfig';
+import useAuth from '../hooks/useAuth'; // ✅ Importar el hook de autenticación
 
 function Registro() {
-  const [name, setName] = useState('');
+  const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [users, setUsers] = useState([]); // Estado para almacenar los usuarios registrados
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ Usar el login del contexto
 
-  // Verificar si ya hay un token y redirigir si es el caso
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Si ya tienes un token, redirigir a la página principal
       navigate('/');
     }
   }, [navigate]);
 
-  // Función para obtener los usuarios registrados
   const fetchUsers = async () => {
     try {
       const res = await axiosInstance.get('/api/users');
@@ -28,19 +28,24 @@ function Registro() {
     }
   };
 
-  // Manejar el registro de un nuevo usuario
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosInstance.post('/api/users/register', 
-        { name, email, password },
+      const res = await axiosInstance.post(
+        '/api/users/register',
+        { nombre, email, password },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      // Almacena el token
-      localStorage.setItem('token', res.data.token);
-      // Obtener los usuarios registrados después de registrarse
+
+      const { token } = res.data;
+
+      // ✅ Usar el login del contexto
+      login(token);
+
+      // Opcional: obtener los usuarios nuevamente
       fetchUsers();
-      navigate('/'); // Redirige al inicio después del registro exitoso
+
+      navigate('/');
     } catch (error) {
       console.error('Error en registro:', error);
       alert('Error al registrarse');
@@ -56,8 +61,8 @@ function Registro() {
             type="text"
             placeholder="Nombre"
             className="w-full p-2 border rounded mb-2"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
           />
           <input
             type="email"
