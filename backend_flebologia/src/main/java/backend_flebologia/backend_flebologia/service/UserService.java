@@ -18,6 +18,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    // Registro de un nuevo usuario
     public String register(String name, String email, String password) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Email ya registrado");
@@ -35,6 +36,7 @@ public class UserService {
         return jwtUtil.generateToken(newUser.getEmail());
     }
 
+    // Login de un usuario existente
     public String login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -46,7 +48,13 @@ public class UserService {
         return jwtUtil.generateToken(user.getEmail());
     }
 
+    // Obtener usuario por email
     public Optional<User> getByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    // Actualizar los detalles del perfil de un usuario
+    public void updateUser(User user) {
+        userRepository.save(user); // Actualiza al usuario en la base de datos
     }
 }

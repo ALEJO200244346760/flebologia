@@ -1,12 +1,13 @@
 package backend_flebologia.backend_flebologia.controller;
 
 import backend_flebologia.backend_flebologia.model.User;
+import backend_flebologia.backend_flebologia.security.CustomUserDetails;
 import backend_flebologia.backend_flebologia.service.PaymentService;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.preference.*;
+import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.preference.Preference;
-import com.mercadopago.exceptions.MPApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -28,44 +29,37 @@ public class PaymentController {
     private String mercadoPagoToken;
 
     @PostMapping("/create_preference")
-    public ResponseEntity<?> createPreference(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> createPreference(@AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
-            // Configurar el token de acceso
+            User user = userDetails.getUser();
             MercadoPagoConfig.setAccessToken(mercadoPagoToken);
 
-            // Crear el cliente de preferencias
             PreferenceClient client = new PreferenceClient();
 
-            // Crear ítem de la preferencia
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
                     .title("Consulta con el Dr. Jorja")
                     .quantity(1)
                     .unitPrice(new BigDecimal("1000"))
                     .build();
 
-            // Crear pagador
             PreferencePayerRequest payerRequest = PreferencePayerRequest.builder()
                     .email(user.getEmail())
                     .build();
 
-            // Crear back URLs
             PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
                     .success("https://flebologia.vercel.app/pago-exitoso")
                     .failure("https://flebologia.vercel.app/failure")
                     .pending("https://flebologia.vercel.app/pending")
                     .build();
 
-            // Crear preferencia
             PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                     .items(List.of(itemRequest))
                     .payer(payerRequest)
                     .backUrls(backUrls)
                     .build();
 
-            // Guardar preferencia
             Preference preference = client.create(preferenceRequest);
 
-            // Retornar el init_point (link de pago)
             return ResponseEntity.ok(Map.of("init_point", preference.getInitPoint()));
 
         } catch (MPException | MPApiException e) {
@@ -74,14 +68,15 @@ public class PaymentController {
     }
 
     @GetMapping("/status")
-    public ResponseEntity<?> checkPaymentStatus(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> checkPaymentStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
         boolean hasPaid = paymentService.hasUserPaid(user);
         return ResponseEntity.ok(Map.of("hasPaid", hasPaid));
     }
 
-    // ✅ NUEVO: Endpoint para confirmar pago manual desde frontend
     @PostMapping("/confirmar-pago")
-    public ResponseEntity<?> confirmarPago(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> confirmarPago(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
         paymentService.marcarComoPagado(user);
         return ResponseEntity.ok(Map.of("message", "Pago confirmado correctamente"));
     }

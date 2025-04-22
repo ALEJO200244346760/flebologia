@@ -11,5 +11,4 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-    // Acá podés seguir agregando endpoints relacionados a usuarios
 }

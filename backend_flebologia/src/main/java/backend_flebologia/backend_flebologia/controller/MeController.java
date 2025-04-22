@@ -1,30 +1,37 @@
 package backend_flebologia.backend_flebologia.controller;
 
+import backend_flebologia.backend_flebologia.security.CustomUserDetails;
 import backend_flebologia.backend_flebologia.model.User;
-import backend_flebologia.backend_flebologia.security.JwtUtil;
+import backend_flebologia.backend_flebologia.dto.ProfileUpdateRequest;
 import backend_flebologia.backend_flebologia.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/me")
+@RequestMapping("/api/me")
 @RequiredArgsConstructor
 public class MeController {
 
-    private final JwtUtil jwtUtil;
     private final UserService userService;
 
+    // Obtener perfil del usuario autenticado
     @GetMapping
-    public ResponseEntity<User> getUserFromToken(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractUsername(token);
+    public ResponseEntity<?> getProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
+        return ResponseEntity.ok(user);
+    }
 
-        return userService.getByEmail(email)
-                .map(user -> {
-                    user.setPassword(null); // por seguridad
-                    return ResponseEntity.ok(user);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    // Actualizar perfil del usuario autenticado
+    @PutMapping
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileUpdateRequest updateRequest,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // Validamos que el usuario que está realizando la petición es el mismo que está actualizando el perfil
+        User user = userDetails.getUser();
+        user.setName(updateRequest.getName());
+        user.setEmail(updateRequest.getEmail()); // Se puede agregar lógica para verificar que el email no esté duplicado
+        userService.updateUser(user);
+        return ResponseEntity.ok(user);
     }
 }

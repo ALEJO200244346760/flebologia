@@ -1,5 +1,7 @@
 package backend_flebologia.backend_flebologia.security;
 
+import backend_flebologia.backend_flebologia.model.User;
+import backend_flebologia.backend_flebologia.repository.UserRepository;
 import backend_flebologia.backend_flebologia.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +23,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -30,7 +33,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // Si la ruta no necesita autenticación, dejamos que pase
         if (path.equals("/api/users/register") || path.equals("/api/users/login") || path.equals("/api/payment/webhook")) {
             filterChain.doFilter(request, response);
             return;
@@ -41,39 +43,19 @@ public class JwtFilter extends OncePerRequestFilter {
         String jwt = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);  // Extraemos el token
-            email = jwtUtil.extractUsername(jwt);  // Extraemos el email del token
-        }
-
-        // Agregamos logs para verificar el flujo
-        if (authHeader == null) {
-            System.out.println("❌ No Authorization header");
-        } else if (!authHeader.startsWith("Bearer ")) {
-            System.out.println("❌ Authorization no empieza con 'Bearer '");
-        } else {
-            System.out.println("🔐 JWT recibido: " + jwt);
-            System.out.println("📧 Usuario del token: " + email);
+            jwt = authHeader.substring(7);
+            email = jwtUtil.extractUsername(jwt);
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Cargamos los detalles del usuario
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            // Validamos el token
             if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
+                        userDetails, null, userDetails.getAuthorities());
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                // Establecemos la autenticación en el contexto
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                System.out.println("✅ Autenticación exitosa");
-            } else {
-                System.out.println("❌ Token inválido");
             }
         }
 

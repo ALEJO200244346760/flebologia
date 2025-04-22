@@ -2,6 +2,7 @@ package backend_flebologia.backend_flebologia.controller;
 
 import backend_flebologia.backend_flebologia.model.ChatMessage;
 import backend_flebologia.backend_flebologia.model.User;
+import backend_flebologia.backend_flebologia.security.CustomUserDetails;
 import backend_flebologia.backend_flebologia.service.ChatMessageService;
 import backend_flebologia.backend_flebologia.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,8 @@ public class ChatController {
     private final ChatMessageService chatMessageService;
 
     @GetMapping
-    public ResponseEntity<String> enterChat(@AuthenticationPrincipal User user) {
-        if (user == null) {
-            return ResponseEntity.status(401).body("No estás autenticado");
-        }
-
+    public ResponseEntity<String> enterChat(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
         if (paymentService.hasUserPaid(user)) {
             return ResponseEntity.ok("Bienvenido al chat con el Dr. Jorja");
         } else {
@@ -34,52 +32,45 @@ public class ChatController {
         }
     }
 
-    // 📨 Guardar mensaje (texto, audio, foto, video)
     @PostMapping
     public ResponseEntity<ChatMessage> enviarMensaje(
             @RequestBody Map<String, String> payload,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        if (user == null) {
-            return ResponseEntity.status(401).body(null); // Cambié a 'null' para hacer coincidir el tipo
-        }
+        User user = userDetails.getUser();
 
         if (!paymentService.hasUserPaid(user)) {
             return ResponseEntity.status(403).build();
         }
 
         String content = payload.get("content");
-        String type = payload.get("type");       // TEXT, IMAGE, AUDIO, VIDEO
+        String type = payload.get("type");
         String mediaUrl = payload.get("mediaUrl");
 
         ChatMessage savedMessage = chatMessageService.saveMessage(content, type, mediaUrl, user);
-        return ResponseEntity.ok(savedMessage); // Aquí se devuelve el tipo correcto
+        return ResponseEntity.ok(savedMessage);
     }
 
-    // 📩 Obtener mensajes del usuario
     @GetMapping("/mensajes")
-    public ResponseEntity<List<ChatMessage>> getMensajes(@AuthenticationPrincipal User user) {
-        if (user == null) {
-            return ResponseEntity.status(401).body(null); // Cambié a 'null' para hacer coincidir el tipo
-        }
+    public ResponseEntity<List<ChatMessage>> getMensajes(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
 
         if (!paymentService.hasUserPaid(user)) {
             return ResponseEntity.status(403).build();
         }
-        return ResponseEntity.ok(chatMessageService.getMessagesForUser(user)); // Se devuelve el tipo correcto
+
+        return ResponseEntity.ok(chatMessageService.getMessagesForUser(user));
     }
 
     @PostMapping("/send")
     public ResponseEntity<?> sendMessage(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam("type") String type,
             @RequestParam(value = "media", required = false) MultipartFile mediaFile
     ) {
         try {
-            if (user == null) {
-                return ResponseEntity.status(401).body("No estás autenticado");
-            }
+            User user = userDetails.getUser();
 
             if (!paymentService.hasUserPaid(user)) {
                 return ResponseEntity.status(403).body("Debes pagar para enviar mensajes.");
@@ -87,8 +78,7 @@ public class ChatController {
 
             String mediaUrl = null;
             if (mediaFile != null && !mediaFile.isEmpty()) {
-                // Lógica para guardar el archivo en disco o nube
-                mediaUrl = chatMessageService.saveMediaFile(mediaFile); // lo vemos abajo
+                mediaUrl = chatMessageService.saveMediaFile(mediaFile);
             }
 
             ChatMessage saved = chatMessageService.saveMessage(content, type, mediaUrl, user);

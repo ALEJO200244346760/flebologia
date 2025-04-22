@@ -2,6 +2,7 @@ package backend_flebologia.backend_flebologia.service;
 
 import backend_flebologia.backend_flebologia.model.User;
 import backend_flebologia.backend_flebologia.repository.UserRepository;
+import backend_flebologia.backend_flebologia.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,15 +17,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Buscamos el usuario en la base de datos por email
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
 
-        // Retornamos el UserDetails necesario para Spring Security
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())  // Usamos el email como username
-                .password(user.getPassword())  // La contraseña encriptada
-                .authorities(user.getRole().name())  // Asignamos el rol del usuario
-                .build();
+        return new CustomUserDetails(user); // 👈 usamos la clase personalizada
     }
 }
