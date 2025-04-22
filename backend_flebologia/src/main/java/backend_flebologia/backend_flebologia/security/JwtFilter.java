@@ -57,15 +57,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // Cargamos los detalles del usuario
-            UserDetails userDetails = null;
-            try {
-                userDetails = userDetailsService.loadUserByUsername(email);
-            } catch (Exception e) {
-                System.out.println("❌ Error al cargar el usuario: " + e.getMessage());
-            }
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            // Verificamos que se haya cargado correctamente el usuario
-            if (userDetails != null && jwtUtil.validateToken(jwt, userDetails.getUsername())) {
+            // Validamos el token
+            if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );
@@ -78,7 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
                 System.out.println("✅ Autenticación exitosa");
             } else {
-                System.out.println("❌ Token inválido o usuario no encontrado");
+                System.out.println("❌ Token inválido");
             }
         }
 
