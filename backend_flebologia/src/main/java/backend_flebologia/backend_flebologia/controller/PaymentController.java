@@ -68,7 +68,7 @@ public class PaymentController {
             // Retornar el init_point (link de pago)
             return ResponseEntity.ok(Map.of("init_point", preference.getInitPoint()));
 
-        } catch (MPException | com.mercadopago.exceptions.MPApiException e) {
+        } catch (MPException | MPApiException e) {
             return ResponseEntity.status(500).body("Error creando preferencia de pago: " + e.getMessage());
         }
     }
@@ -77,5 +77,12 @@ public class PaymentController {
     public ResponseEntity<?> checkPaymentStatus(@AuthenticationPrincipal User user) {
         boolean hasPaid = paymentService.hasUserPaid(user);
         return ResponseEntity.ok(Map.of("hasPaid", hasPaid));
+    }
+
+    // ✅ NUEVO: Endpoint para confirmar pago manual desde frontend
+    @PostMapping("/confirmar-pago")
+    public ResponseEntity<?> confirmarPago(@AuthenticationPrincipal User user) {
+        paymentService.marcarComoPagado(user);
+        return ResponseEntity.ok(Map.of("message", "Pago confirmado correctamente"));
     }
 }

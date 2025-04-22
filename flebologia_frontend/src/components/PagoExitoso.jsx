@@ -8,12 +8,7 @@ const PagoExitoso = () => {
   useEffect(() => {
     const marcarComoPagadoYRedirigir = async () => {
       try {
-        const token = localStorage.getItem('token');
-        await axiosInstance.post('/api/payment/mark_as_paid', {}, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        await axiosInstance.post('/api/payment/confirmar-pago');
 
         // Espera 1 segundo y redirige al chat
         setTimeout(() => {
