@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axiosConfig';
-
+import axios from '../axiosConfig';
 const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
 

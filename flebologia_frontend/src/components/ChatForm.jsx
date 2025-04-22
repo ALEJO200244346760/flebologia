@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axiosConfig';
-
+import axios from '../axiosConfig';
 const ChatForm = () => {
   const [content, setContent] = useState('');
   const [type, setType] = useState('TEXT');
