@@ -1,7 +1,7 @@
 // src/components/ChatMessages.js
 import React, { useState, useEffect } from 'react';
 import axios from '../axiosConfig';
-import { useAuth } from '../hooks/useAuth'; // Asegurate de tener este hook implementado
+import useAuth from '../hooks/useAuth';
 
 const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
