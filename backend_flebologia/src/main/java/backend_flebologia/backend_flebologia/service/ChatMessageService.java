@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,7 +21,6 @@ import java.util.stream.Collectors;
 public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
-    private final S3Service s3Service; // ☁️ Inyectamos servicio de Amazon S3
 
     public ChatMessage saveMessage(String content, String type, String mediaUrl, User sender) {
         ChatMessage message = ChatMessage.builder()
@@ -30,9 +33,23 @@ public class ChatMessageService {
     }
 
     public List<ChatMessage> getMessagesForUser(User sender) {
-        return chatMessageRepository.findBySender(sender);
+        return chatMessageRepository.findBySender(sender); // ← ✅ Usa este método, no findBySenderId
     }
+    public String saveMediaFile(MultipartFile file) throws IOException {
+        String uploadDir = "uploads/chat/";
+        String originalFilename = file.getOriginalFilename();
+        String uniqueFilename = System.currentTimeMillis() + "_" + originalFilename;
 
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        Path filePath = uploadPath.resolve(uniqueFilename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/uploads/chat/" + uniqueFilename; // o una URL pública si subís a S3 por ejemplo
+    }
     public Set<User> obtenerUsuariosConMensajes() {
         return chatMessageRepository.findAll()
                 .stream()
@@ -40,7 +57,4 @@ public class ChatMessageService {
                 .collect(Collectors.toSet());
     }
 
-    public String saveMediaFile(MultipartFile file) throws IOException {
-        return s3Service.uploadFile(file); // ✅ Reemplazo de almacenamiento local por S3
-    }
 }
