@@ -9,6 +9,7 @@ import backend_flebologia.backend_flebologia.service.ChatMessageService;
 import backend_flebologia.backend_flebologia.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,8 +104,13 @@ public class ChatController {
     }
 
     @PostMapping("/admin/enviar")
-    public ResponseEntity<?> enviarMensajeComoDoctor(@RequestBody ChatDTO dto) {
-        User doctor = userRepository.findByEmail("drjorja@flebologia.com").orElseThrow();
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> enviarMensajeComoDoctor(
+            @AuthenticationPrincipal CustomUserDetails admin,
+            @RequestBody ChatDTO dto
+    ) {
+        // Este debería ser el admin logueado
+        User doctor = admin.getUser();
         User paciente = userRepository.findById(dto.getUserId()).orElseThrow();
 
         ChatMessage msg = chatMessageService.saveMessage(dto.getContent(), dto.getType(), dto.getMediaUrl(), doctor);
