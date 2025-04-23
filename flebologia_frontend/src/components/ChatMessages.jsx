@@ -28,7 +28,7 @@ const ChatMessages = () => {
   }, [messages]);
 
   return (
-    <div className="max-w-4xl mx-auto p-4 flex flex-col h-[calc(100vh-130px)]">
+    <div className="w-full max-w-screen-lg mx-auto p-6 flex flex-col h-[calc(100vh-130px)]">
       <div className="flex-1 overflow-y-auto space-y-4">
         {messages.map((msg) => (
           <div
@@ -38,7 +38,7 @@ const ChatMessages = () => {
             }`}
           >
             <div
-              className={`max-w-xs p-3 rounded-lg shadow-md ${
+              className={`max-w-md md:max-w-lg lg:max-w-xl p-4 rounded-lg shadow ${
                 msg.sender.email === 'drjorja@flebologia.com'
                   ? 'bg-blue-100 text-blue-800'
                   : 'bg-green-100 text-green-800'
