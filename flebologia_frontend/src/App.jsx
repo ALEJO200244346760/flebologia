@@ -8,6 +8,8 @@ import Chat from './pages/ChatPage';
 import Registro from './pages/Registro';
 import Cobrar from './components/Cobrar';
 import PagoExitoso from './components/PagoExitoso';
+import AdminChat from './pages/AdminChat';
+import AdminDashboard from './pages/AdminDashboard';
 import { AuthProvider } from './context/AuthContext'; // 👈 importante
 
 function App() {

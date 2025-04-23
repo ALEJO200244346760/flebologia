@@ -79,7 +79,14 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-			<!-- Spring Boot Starter Thymeleaf (si usas Thymeleaf para vistas) -->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.25.11</version>
+		</dependency>
+
+
+		<!-- Spring Boot Starter Thymeleaf (si usas Thymeleaf para vistas) -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-thymeleaf</artifactId>
