@@ -102,18 +102,24 @@ public class ChatController {
         User user = userRepository.findById(userId).orElseThrow();
         return ResponseEntity.ok(chatMessageService.getMessagesForUser(user));
     }
-
+    
     @PostMapping("/admin/enviar")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> enviarMensajeComoDoctor(
             @AuthenticationPrincipal CustomUserDetails admin,
             @RequestBody ChatDTO dto
     ) {
-        // Este debería ser el admin logueado
         User doctor = admin.getUser();
         User paciente = userRepository.findById(dto.getUserId()).orElseThrow();
 
-        ChatMessage msg = chatMessageService.saveMessage(dto.getContent(), dto.getType(), dto.getMediaUrl(), doctor);
+        ChatMessage msg = chatMessageService.saveMessage(
+                dto.getContent(),
+                dto.getType(),
+                dto.getMediaUrl(),
+                doctor,
+                paciente // ✅ receptor
+        );
+
         return ResponseEntity.ok(msg);
     }
 

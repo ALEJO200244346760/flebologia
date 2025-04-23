@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,15 +23,17 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
 
-    public ChatMessage saveMessage(String content, String type, String mediaUrl, User sender) {
-        ChatMessage message = ChatMessage.builder()
-                .content(content)
-                .type(type)
-                .mediaUrl(mediaUrl)
-                .sender(sender)
-                .build();
+    public ChatMessage saveMessage(String content, String type, String mediaUrl, User sender, User recipient) {
+        ChatMessage message = new ChatMessage();
+        message.setContent(content);
+        message.setType(type);
+        message.setMediaUrl(mediaUrl);
+        message.setSender(sender);
+        message.setRecipient(recipient);
+        message.setTimestamp(LocalDateTime.now());
         return chatMessageRepository.save(message);
     }
+
 
     public List<ChatMessage> getMessagesForUser(User sender) {
         return chatMessageRepository.findBySender(sender); // ← ✅ Usa este método, no findBySenderId

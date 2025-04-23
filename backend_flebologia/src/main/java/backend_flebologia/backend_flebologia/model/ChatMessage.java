@@ -28,4 +28,8 @@ public class ChatMessage {
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private User sender;
+
+    @ManyToOne
+    @JoinColumn(name = "recipient_id")
+    private User recipient; // 👉 nuevo campo
 }
