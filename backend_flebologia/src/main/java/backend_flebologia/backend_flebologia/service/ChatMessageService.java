@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -34,10 +31,10 @@ public class ChatMessageService {
         return chatMessageRepository.save(message);
     }
 
-
-    public List<ChatMessage> getMessagesForUser(User sender) {
-        return chatMessageRepository.findBySender(sender); // ← ✅ Usa este método, no findBySenderId
+    public List<ChatMessage> getMessagesForUser(User user) {
+        return chatMessageRepository.findBySenderOrRecipientOrderByTimestampAsc(user, user);
     }
+
     public String saveMediaFile(MultipartFile file) throws IOException {
         String uploadDir = "uploads/chat/";
         String originalFilename = file.getOriginalFilename();
@@ -51,13 +48,13 @@ public class ChatMessageService {
         Path filePath = uploadPath.resolve(uniqueFilename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return "/uploads/chat/" + uniqueFilename; // o una URL pública si subís a S3 por ejemplo
+        return "/uploads/chat/" + uniqueFilename;
     }
+
     public Set<User> obtenerUsuariosConMensajes() {
         return chatMessageRepository.findAll()
                 .stream()
                 .map(ChatMessage::getSender)
                 .collect(Collectors.toSet());
     }
-
 }

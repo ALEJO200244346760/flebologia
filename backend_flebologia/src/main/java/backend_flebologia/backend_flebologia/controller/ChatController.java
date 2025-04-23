@@ -51,7 +51,9 @@ public class ChatController {
         String type = payload.get("type");
         String mediaUrl = payload.get("mediaUrl");
 
-        ChatMessage savedMessage = chatMessageService.saveMessage(content, type, mediaUrl, user);
+        // El destinatario por defecto es el doctor
+        User doctor = userRepository.findByEmail("drjorja@flebologia.com").orElseThrow();
+        ChatMessage savedMessage = chatMessageService.saveMessage(content, type, mediaUrl, user, doctor);
         return ResponseEntity.ok(savedMessage);
     }
 
@@ -85,13 +87,15 @@ public class ChatController {
                 mediaUrl = chatMessageService.saveMediaFile(mediaFile);
             }
 
-            ChatMessage saved = chatMessageService.saveMessage(content, type, mediaUrl, user);
+            User doctor = userRepository.findByEmail("drjorja@flebologia.com").orElseThrow();
+            ChatMessage saved = chatMessageService.saveMessage(content, type, mediaUrl, user, doctor);
             return ResponseEntity.ok(saved);
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al enviar el mensaje: " + e.getMessage());
         }
     }
+
     @GetMapping("/admin/usuarios")
     public ResponseEntity<?> obtenerUsuariosConChat() {
         return ResponseEntity.ok(chatMessageService.obtenerUsuariosConMensajes());
@@ -102,7 +106,7 @@ public class ChatController {
         User user = userRepository.findById(userId).orElseThrow();
         return ResponseEntity.ok(chatMessageService.getMessagesForUser(user));
     }
-    
+
     @PostMapping("/admin/enviar")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> enviarMensajeComoDoctor(
@@ -117,7 +121,7 @@ public class ChatController {
                 dto.getType(),
                 dto.getMediaUrl(),
                 doctor,
-                paciente // ✅ receptor
+                paciente
         );
 
         return ResponseEntity.ok(msg);
