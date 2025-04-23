@@ -26,7 +26,7 @@ const ChatMessages = () => {
         >
           {msg.sender.email !== 'drjorja@flebologia.com' && (
             <img
-              src="/public/doctor.jpg"
+              src="/doctor.jpg"
               alt="Dr. Jorja"
               className="w-10 h-10 rounded-full mr-2"
             />
