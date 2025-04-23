@@ -1,13 +1,46 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from '../axiosConfig';
-import { PaperClipIcon, MicrophoneIcon } from '@heroicons/react/24/outline'; // si usás heroicons
+import { PaperClipIcon, MicrophoneIcon } from '@heroicons/react/24/outline';
 
-const ChatForm = () => {
+const ChatForm = ({ onMessageSent }) => {
   const [content, setContent] = useState('');
   const [mediaFile, setMediaFile] = useState(null);
   const [type, setType] = useState('TEXT');
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const [audioChunks, setAudioChunks] = useState([]);
+
   const fileInputRef = useRef(null);
   const audioInputRef = useRef(null);
+
+  // 🎙️ INICIAR GRABACIÓN
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const recorder = new MediaRecorder(stream);
+    mediaRecorderRef.current = recorder;
+    setRecording(true);
+    setAudioChunks([]);
+
+    recorder.ondataavailable = (e) => {
+      setAudioChunks(prev => [...prev, e.data]);
+    };
+
+    recorder.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      const audioFile = new File([audioBlob], 'grabacion.webm', { type: 'audio/webm' });
+      setMediaFile(audioFile);
+      setType('AUDIO');
+      setRecording(false);
+    };
+
+    recorder.start();
+  };
+
+  // 🛑 DETENER GRABACIÓN
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setRecording(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,6 +58,8 @@ const ChatForm = () => {
       setContent('');
       setMediaFile(null);
       setType('TEXT');
+
+      onMessageSent?.(); // 🔄 llamar para recargar mensajes
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
     }
@@ -47,12 +82,12 @@ const ChatForm = () => {
         className="flex-1 resize-none p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      {/* Botón para imagen/video */}
+      {/* Imagen/video */}
       <button
         type="button"
         onClick={() => fileInputRef.current.click()}
         className="p-2 bg-gray-100 rounded-full hover:bg-gray-200"
-        title="Enviar imagen o video"
+        title="Adjuntar archivo"
       >
         <PaperClipIcon className="h-6 w-6 text-gray-600" />
       </button>
@@ -60,26 +95,21 @@ const ChatForm = () => {
         ref={fileInputRef}
         type="file"
         accept="image/*,video/*"
-        onChange={(e) => handleFileChange(e, e.target.files[0].type.startsWith('image/') ? 'IMAGE' : 'VIDEO')}
+        onChange={(e) =>
+          handleFileChange(e, e.target.files[0].type.startsWith('image/') ? 'IMAGE' : 'VIDEO')
+        }
         className="hidden"
       />
 
-      {/* Botón para audio */}
+      {/* 🎙️ Micrófono */}
       <button
         type="button"
-        onClick={() => audioInputRef.current.click()}
-        className="p-2 bg-gray-100 rounded-full hover:bg-gray-200"
-        title="Enviar audio"
+        onClick={recording ? stopRecording : startRecording}
+        className={`p-2 rounded-full ${recording ? 'bg-red-500' : 'bg-gray-100 hover:bg-gray-200'}`}
+        title="Grabar audio"
       >
-        <MicrophoneIcon className="h-6 w-6 text-gray-600" />
+        <MicrophoneIcon className="h-6 w-6 text-white" />
       </button>
-      <input
-        ref={audioInputRef}
-        type="file"
-        accept="audio/*"
-        onChange={(e) => handleFileChange(e, 'AUDIO')}
-        className="hidden"
-      />
 
       <button
         type="submit"
