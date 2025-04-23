@@ -1,3 +1,4 @@
+// src/components/Header.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
@@ -8,10 +9,7 @@ function Header() {
   const auth = useAuth() || {};
   const { user = {}, logout, token } = auth;
 
-  const handleContactClick = () => {
-    navigate('/contact');
-    setMenuOpen(false);
-  };
+  const isAdmin = user?.role === 'ADMIN';
 
   const handleLoginClick = () => {
     navigate('/login');
@@ -84,12 +82,26 @@ function Header() {
 
         {/* Menú - Desktop */}
         <div className="hidden md:flex space-x-4 items-center">
-          <button
-            onClick={handleContactClick}
-            className="px-6 py-2 text-xl font-bold text-cyan-500 bg-white rounded-lg shadow-lg hover:bg-cyan-50 transition-all duration-300"
-          >
-            Contacto
-          </button>
+          {!isAdmin && (
+            <button
+              onClick={() => {
+                navigate('/contact');
+                setMenuOpen(false);
+              }}
+              className="px-6 py-2 text-xl font-bold text-cyan-500 bg-white rounded-lg shadow-lg hover:bg-cyan-50 transition-all duration-300"
+            >
+              Contacto
+            </button>
+          )}
+
+          {isAdmin && (
+            <button
+              onClick={() => navigate('/admin/chat')}
+              className="px-6 py-2 text-sm font-bold text-white bg-blue-700 rounded-lg shadow hover:bg-blue-800"
+            >
+              Panel Admin
+            </button>
+          )}
 
           {token ? (
             <div className="flex items-center space-x-3 text-white text-right">
@@ -122,12 +134,28 @@ function Header() {
       {/* Menú desplegable - Móvil */}
       {menuOpen && (
         <div className="md:hidden mt-4 space-y-3 bg-white text-blue-600 rounded-md shadow-lg p-4 mx-2">
-          <button
-            onClick={handleContactClick}
-            className="w-full text-left font-semibold hover:underline"
-          >
-            Contacto
-          </button>
+          {!isAdmin && (
+            <button
+              onClick={() => {
+                navigate('/contact');
+                setMenuOpen(false);
+              }}
+              className="w-full text-left font-semibold hover:underline"
+            >
+              Contacto
+            </button>
+          )}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                navigate('/admin/chat');
+                setMenuOpen(false);
+              }}
+              className="w-full text-left font-semibold hover:underline"
+            >
+              Panel Admin
+            </button>
+          )}
           {token ? (
             <>
               <div className="flex items-center space-x-3">

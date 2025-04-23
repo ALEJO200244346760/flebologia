@@ -22,8 +22,32 @@ function Login() {
       console.log('Respuesta del servidor:', res);
 
       // ✅ Usar login del contexto para actualizar el estado global
-      login(token); // 👈 Esto hace todo: setToken, setUser y re-render
+      login(token);
 
+      const me = await axiosInstance.get('/api/users/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (me.data.role === 'ADMIN') {
+        navigate('/admin/chat');
+      } else {
+        try {
+          const checkPago = await axiosInstance.get('/api/chat', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (checkPago.status === 200) {
+            navigate('/chat');
+          }
+        } catch (error) {
+          if (error.response?.status === 403) {
+            navigate('/pago');
+          } else {
+            console.error('Error verificando pago:', error);
+            alert('Error inesperado al verificar el estado de pago');
+          }
+        }
+      }
+      
       // ✅ Verificamos si ya pagó
       try {
         const checkPago = await axiosInstance.get('/api/chat', {
