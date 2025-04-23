@@ -27,13 +27,14 @@ export const AuthProvider = ({ children }) => {
       setUser({
         nombre: decodedToken?.nombre || '',
         apellido: decodedToken?.apellido || '',
-        email: decodedToken?.email || '', // ✅ agregado
+        email: decodedToken?.email || '',
+        role: decodedToken?.role || '', // 👈 Agregado
       });
     } else {
-      setUser({ nombre: '', apellido: '', email: '' });
+      setUser({ nombre: '', apellido: '', email: '', role: '' });
     }
   }, [token]);
-
+  
   const login = (newToken) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
@@ -41,9 +42,10 @@ export const AuthProvider = ({ children }) => {
     setUser({
       nombre: decodedToken?.nombre || '',
       apellido: decodedToken?.apellido || '',
-      email: decodedToken?.email || '', // ✅ agregado
+      email: decodedToken?.email || '',
+      role: decodedToken?.role || '', // 👈 Agregado
     });
-  };
+  };  
 
   const logout = () => {
     localStorage.removeItem('token');
