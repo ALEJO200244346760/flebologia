@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../axiosConfig';
 
+const ADMIN_EMAIL = 'admin@flebologia.com';
+
 const AdminChat = () => {
   const { userId } = useParams();
   const [messages, setMessages] = useState([]);
@@ -53,24 +55,26 @@ const AdminChat = () => {
       <div className="flex-1 overflow-y-auto space-y-4 pr-2">
         {messages
           .filter(msg =>
-            (msg.sender.email === 'drjorja@flebologia.com' && msg.recipient.id == userId) ||
-            (msg.sender.id == userId && msg.recipient.email === 'drjorja@flebologia.com')
+            msg.sender &&
+            msg.recipient &&
+            (
+              (msg.sender.email === ADMIN_EMAIL && msg.recipient.id == userId) ||
+              (msg.sender.id == userId && msg.recipient.email === ADMIN_EMAIL)
+            )
           )
           .map(msg => (
             <div
               key={msg.id}
-              className={`flex ${
-                msg.sender.email === 'drjorja@flebologia.com' ? 'justify-end' : 'justify-start'
-              }`}
+              className={`flex ${msg.sender?.email === ADMIN_EMAIL ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-md md:max-w-lg lg:max-w-xl p-4 rounded-lg shadow ${
-                  msg.sender.email === 'drjorja@flebologia.com'
+                  msg.sender?.email === ADMIN_EMAIL
                     ? 'bg-green-100 text-green-800'
                     : 'bg-blue-100 text-blue-800'
                 }`}
               >
-                <p className="text-sm font-semibold mb-1">{msg.sender.email}</p>
+                <p className="text-sm font-semibold mb-1">{msg.sender?.email || 'Desconocido'}</p>
                 <p>{msg.content}</p>
                 {msg.type === 'IMAGE' && (
                   <img src={msg.mediaUrl} alt="Imagen" className="mt-2 max-w-full rounded-lg" />
