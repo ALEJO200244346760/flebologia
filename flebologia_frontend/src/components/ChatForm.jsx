@@ -1,11 +1,13 @@
-// src/components/ChatForm.js
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from '../axiosConfig';
+import { PaperClipIcon, MicrophoneIcon } from '@heroicons/react/24/outline'; // si usás heroicons
 
 const ChatForm = () => {
   const [content, setContent] = useState('');
   const [mediaFile, setMediaFile] = useState(null);
   const [type, setType] = useState('TEXT');
+  const fileInputRef = useRef(null);
+  const audioInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,50 +30,62 @@ const ChatForm = () => {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, mediaType) => {
     const file = e.target.files[0];
-    if (!file) return;
-
-    setMediaFile(file);
-    if (file.type.startsWith('image/')) {
-      setType('IMAGE');
-    } else if (file.type.startsWith('audio/')) {
-      setType('AUDIO');
-    } else if (file.type.startsWith('video/')) {
-      setType('VIDEO');
-    } else {
-      setType('TEXT'); // fallback
+    if (file) {
+      setMediaFile(file);
+      setType(mediaType);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-2 mt-4 p-2 border-t">
+    <form onSubmit={handleSubmit} className="flex items-center space-x-2 px-4 py-3 border-t border-gray-300">
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Escribe tu mensaje..."
-        className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none resize-none"
-        rows={2}
+        className="flex-1 resize-none p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      {/* Botón de adjuntar archivo (➕) */}
-      <label className="cursor-pointer p-2 text-blue-600 hover:text-blue-800">
-        ➕
-        <input
-          type="file"
-          accept="image/*,audio/*,video/*"
-          onChange={handleFileChange}
-          className="hidden"
-        />
-      </label>
+      {/* Botón para imagen/video */}
+      <button
+        type="button"
+        onClick={() => fileInputRef.current.click()}
+        className="p-2 bg-gray-100 rounded-full hover:bg-gray-200"
+        title="Enviar imagen o video"
+      >
+        <PaperClipIcon className="h-6 w-6 text-gray-600" />
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*,video/*"
+        onChange={(e) => handleFileChange(e, e.target.files[0].type.startsWith('image/') ? 'IMAGE' : 'VIDEO')}
+        className="hidden"
+      />
 
-      {/* Botón de enviar */}
+      {/* Botón para audio */}
+      <button
+        type="button"
+        onClick={() => audioInputRef.current.click()}
+        className="p-2 bg-gray-100 rounded-full hover:bg-gray-200"
+        title="Enviar audio"
+      >
+        <MicrophoneIcon className="h-6 w-6 text-gray-600" />
+      </button>
+      <input
+        ref={audioInputRef}
+        type="file"
+        accept="audio/*"
+        onChange={(e) => handleFileChange(e, 'AUDIO')}
+        className="hidden"
+      />
+
       <button
         type="submit"
-        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 w-10 h-10 flex items-center justify-center"
-        title="Enviar"
+        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
       >
-        {type === 'AUDIO' ? '🎤' : '📤'}
+        Enviar
       </button>
     </form>
   );
