@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from '../axiosConfig';
 import ChatForm from './ChatForm';
 
 const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -14,13 +15,21 @@ const ChatMessages = () => {
     }
   }, []);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="space-y-4 mb-4">
+    <div className="max-w-4xl mx-auto p-4 flex flex-col h-[calc(100vh-130px)]">
+      <div className="flex-1 overflow-y-auto space-y-4">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -52,9 +61,9 @@ const ChatMessages = () => {
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* ⬇️ Ahora ChatForm le pasa una función a llamar cuando se envía mensaje */}
       <ChatForm onMessageSent={fetchMessages} />
     </div>
   );
