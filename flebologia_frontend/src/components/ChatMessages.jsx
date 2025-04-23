@@ -1,50 +1,62 @@
+// src/components/ChatMessages.js
 import React, { useState, useEffect } from 'react';
 import axios from '../axiosConfig';
+
 const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
 
-  const fetchMessages = async () => {
-    try {
-      const response = await axios.get('https://flebologia-production.up.railway.app/api/chat/mensajes');
-      setMessages(response.data);
-    } catch (error) {
-      console.error('Error al cargar mensajes:', error);
-    }
-  };
-
   useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await axios.get('/api/chat/mensajes');
+        setMessages(response.data);
+      } catch (error) {
+        console.error('Error al cargar mensajes:', error);
+      }
+    };
     fetchMessages();
   }, []);
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-4">
+    <div className="space-y-4">
       {messages.map((msg) => (
         <div
           key={msg.id}
-          className="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+          className={`flex items-start ${msg.sender.email === 'drjorja@flebologia.com' ? 'justify-start' : 'justify-end'}`}
         >
-          <div className="text-sm text-gray-500 mb-2">{msg.sender.email}</div>
-          <div className="text-gray-800 mb-2">{msg.content}</div>
-
-          {msg.type === 'IMAGE' && (
+          {msg.sender.email !== 'drjorja@flebologia.com' && (
             <img
-              src={`https://flebologia-production.up.railway.app${msg.mediaUrl}`}
-              alt="Imagen"
-              className="max-w-full rounded-lg"
+              src="/public/doctor.jpg"
+              alt="Dr. Jorja"
+              className="w-10 h-10 rounded-full mr-2"
             />
           )}
-
-          {msg.type === 'AUDIO' && (
-            <audio controls className="w-full">
-              <source src={`https://flebologia-production.up.railway.app${msg.mediaUrl}`} />
-            </audio>
-          )}
-
-          {msg.type === 'VIDEO' && (
-            <video controls className="w-full rounded-lg">
-              <source src={`https://flebologia-production.up.railway.app${msg.mediaUrl}`} />
-            </video>
-          )}
+          <div
+            className={`max-w-xs p-3 rounded-lg shadow-md ${
+              msg.sender.email === 'drjorja@flebologia.com'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-green-100 text-green-800'
+            }`}
+          >
+            {msg.content}
+            {msg.type === 'IMAGE' && (
+              <img
+                src={msg.mediaUrl}
+                alt="Imagen"
+                className="mt-2 max-w-full rounded-lg"
+              />
+            )}
+            {msg.type === 'AUDIO' && (
+              <audio controls className="mt-2 w-full">
+                <source src={msg.mediaUrl} />
+              </audio>
+            )}
+            {msg.type === 'VIDEO' && (
+              <video controls className="mt-2 w-full rounded-lg">
+                <source src={msg.mediaUrl} />
+              </video>
+            )}
+          </div>
         </div>
       ))}
     </div>

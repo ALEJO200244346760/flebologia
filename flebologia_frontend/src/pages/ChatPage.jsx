@@ -1,15 +1,20 @@
+// src/pages/ChatPage.js
 import React from 'react';
-import ChatForm from '../components/ChatForm';
 import ChatMessages from '../components/ChatMessages';
+import ChatForm from '../components/ChatForm';
 
 const ChatPage = () => {
   return (
-    <div className="pt-16 p-4 max-w-3xl mx-auto"> {/* <-- padding-top agregado */}
-      <h2 className="text-2xl font-bold mb-4 text-center">Chat con el Dr. Jorja</h2>
-      <div className="mb-4 max-h-[400px] overflow-y-auto border rounded-lg p-2 bg-white shadow">
+    <div className="flex flex-col h-screen pt-16 bg-gray-100">
+      <header className="bg-blue-600 text-white py-3 text-center">
+        <h2 className="text-xl font-semibold">Chat con el Dr. Jorja</h2>
+      </header>
+      <div className="flex-1 overflow-auto p-4">
         <ChatMessages />
       </div>
-      <ChatForm />
+      <div className="p-4 bg-white shadow-md">
+        <ChatForm />
+      </div>
     </div>
   );
 };
