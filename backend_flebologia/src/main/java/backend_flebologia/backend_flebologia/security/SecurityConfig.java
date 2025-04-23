@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/chat/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers("/api/payment/webhook").permitAll() // solo este sin auth

@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,4 +50,11 @@ public class ChatMessageService {
 
         return "/uploads/chat/" + uniqueFilename; // o una URL pública si subís a S3 por ejemplo
     }
+    public Set<User> obtenerUsuariosConMensajes() {
+        return chatMessageRepository.findAll()
+                .stream()
+                .map(ChatMessage::getSender)
+                .collect(Collectors.toSet());
+    }
+
 }

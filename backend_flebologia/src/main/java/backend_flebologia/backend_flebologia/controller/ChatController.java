@@ -1,7 +1,9 @@
 package backend_flebologia.backend_flebologia.controller;
 
+import backend_flebologia.backend_flebologia.dto.ChatDTO;
 import backend_flebologia.backend_flebologia.model.ChatMessage;
 import backend_flebologia.backend_flebologia.model.User;
+import backend_flebologia.backend_flebologia.repository.UserRepository;
 import backend_flebologia.backend_flebologia.security.CustomUserDetails;
 import backend_flebologia.backend_flebologia.service.ChatMessageService;
 import backend_flebologia.backend_flebologia.service.PaymentService;
@@ -21,6 +23,7 @@ public class ChatController {
 
     private final PaymentService paymentService;
     private final ChatMessageService chatMessageService;
+    private final UserRepository userRepository;
 
     @GetMapping
     public ResponseEntity<String> enterChat(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -88,4 +91,24 @@ public class ChatController {
             return ResponseEntity.status(500).body("Error al enviar el mensaje: " + e.getMessage());
         }
     }
+    @GetMapping("/admin/usuarios")
+    public ResponseEntity<?> obtenerUsuariosConChat() {
+        return ResponseEntity.ok(chatMessageService.obtenerUsuariosConMensajes());
+    }
+
+    @GetMapping("/admin/mensajes/{userId}")
+    public ResponseEntity<List<ChatMessage>> verMensajesPaciente(@PathVariable Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        return ResponseEntity.ok(chatMessageService.getMessagesForUser(user));
+    }
+
+    @PostMapping("/admin/enviar")
+    public ResponseEntity<?> enviarMensajeComoDoctor(@RequestBody ChatDTO dto) {
+        User doctor = userRepository.findByEmail("drjorja@flebologia.com").orElseThrow();
+        User paciente = userRepository.findById(dto.getUserId()).orElseThrow();
+
+        ChatMessage msg = chatMessageService.saveMessage(dto.getContent(), dto.getType(), dto.getMediaUrl(), doctor);
+        return ResponseEntity.ok(msg);
+    }
+
 }

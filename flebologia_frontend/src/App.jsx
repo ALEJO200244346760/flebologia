@@ -23,6 +23,8 @@ function App() {
           <Route path="/chat" element={<Chat />} />
           <Route path="/pago" element={<Cobrar />} />
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
+          <Route path="/admin/chat" element={<AdminDashboard />} />
+          <Route path="/admin/chat/:userId" element={<AdminChat />} />
         </Routes>
       </Router>
     </AuthProvider>
