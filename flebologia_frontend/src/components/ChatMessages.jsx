@@ -48,7 +48,7 @@ const ChatMessages = () => {
               className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}  // Alinea los mensajes
             >
               <div
-                className={`max-w-md md:max-w-lg lg:max-w-xl p-4 rounded-lg shadow ${
+                className={`max-w-[85%] md:max-w-[70%] lg:max-w-[60%] p-4 rounded-lg shadow ${
                   isMine
                     ? 'bg-green-100 text-green-800'  // Mensaje del usuario, se coloca a la derecha
                     : 'bg-blue-100 text-blue-800'    // Mensaje del administrador, se coloca a la izquierda
