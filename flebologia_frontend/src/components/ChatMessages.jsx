@@ -8,6 +8,7 @@ const ChatMessages = () => {
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
 
+  // Función para obtener los mensajes
   const fetchMessages = useCallback(async () => {
     try {
       // Asegúrate de filtrar los mensajes para el usuario actual
@@ -18,6 +19,7 @@ const ChatMessages = () => {
     }
   }, []);
 
+  // Función para hacer scroll hacia el final de los mensajes
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -43,7 +45,7 @@ const ChatMessages = () => {
           return (
             <div
               key={msg.id}
-              className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}  // Alinea los mensajes
             >
               <div
                 className={`max-w-md md:max-w-lg lg:max-w-xl p-4 rounded-lg shadow ${
@@ -56,6 +58,7 @@ const ChatMessages = () => {
                 <p className="text-sm font-semibold mb-1">{msg.sender?.email || 'Usuario Desconocido'}</p>
                 <p>{msg.content}</p>
 
+                {/* Mostrar el tipo de contenido multimedia si existe */}
                 {msg.type === 'IMAGE' && (
                   <img src={msg.mediaUrl} alt="Imagen" className="mt-2 max-w-full rounded-lg" />
                 )}
@@ -73,9 +76,10 @@ const ChatMessages = () => {
             </div>
           );
         })}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} /> {/* Esto asegura que el scroll llegue al final */}
       </div>
 
+      {/* Formulario para enviar mensajes */}
       <ChatForm onMessageSent={fetchMessages} />
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
-import { useAuth } from '../hooks/useAuth'; // 🔐 Asegurate de tener este hook
+import useAuth from '../hooks/useAuth'; // 🔐 Asegurate de tener este hook
 
 const AdminChat = () => {
   const { userId } = useParams();
