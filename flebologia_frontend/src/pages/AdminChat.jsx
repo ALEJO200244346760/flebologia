@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
 import useAuth from '../hooks/useAuth'; // 🔐 Asegurate de tener este hook
+import { PaperClipIcon, MicrophoneIcon } from '@heroicons/react/24/outline';
 
 const AdminChat = () => {
   const { userId } = useParams();
@@ -10,6 +11,14 @@ const AdminChat = () => {
 
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState('');
+  const [mediaFile, setMediaFile] = useState(null);
+  const [type, setType] = useState('TEXT');
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const [audioChunks, setAudioChunks] = useState([]);
+
+  const fileInputRef = useRef(null);
+  const audioInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   const fetchMessages = useCallback(async () => {
@@ -35,20 +44,62 @@ const AdminChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 🎙️ INICIAR GRABACIÓN
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const recorder = new MediaRecorder(stream);
+    mediaRecorderRef.current = recorder;
+    setRecording(true);
+    setAudioChunks([]);
+
+    recorder.ondataavailable = (e) => {
+      setAudioChunks(prev => [...prev, e.data]);
+    };
+
+    recorder.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      const audioFile = new File([audioBlob], 'grabacion.webm', { type: 'audio/webm' });
+      setMediaFile(audioFile);
+      setType('AUDIO');
+      setRecording(false);
+    };
+
+    recorder.start();
+  };
+
+  // 🛑 DETENER GRABACIÓN
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setRecording(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!content.trim()) return;
+    if (!content.trim() && !mediaFile) return;
+
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('type', type);
+    if (mediaFile) formData.append('media', mediaFile);
 
     try {
-      await axios.post('/api/chat/admin/enviar', {
-        userId: parseInt(userId),
-        content,
-        type: 'TEXT',
+      await axios.post('/api/chat/admin/enviar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       setContent('');
+      setMediaFile(null);
+      setType('TEXT');
       await fetchMessages();
     } catch (err) {
       console.error('Error enviando mensaje:', err);
+    }
+  };
+
+  const handleFileChange = (e, mediaType) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMediaFile(file);
+      setType(mediaType);
     }
   };
 
@@ -105,17 +156,47 @@ const AdminChat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 mt-4">
-        <input
-          type="text"
+      {/* Formulario similar a ChatForm */}
+      <form onSubmit={handleSubmit} className="flex items-center space-x-2 px-4 py-3 border-t border-gray-300">
+        <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Escribe tu mensaje..."
-          className="flex-1 border p-3 rounded-lg shadow"
+          className="flex-1 resize-none p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
+        {/* Imagen/video */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current.click()}
+          className="p-2 bg-gray-100 rounded-full hover:bg-gray-200"
+          title="Adjuntar archivo"
+        >
+          <PaperClipIcon className="h-6 w-6 text-gray-600" />
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,video/*"
+          onChange={(e) =>
+            handleFileChange(e, e.target.files[0].type.startsWith('image/') ? 'IMAGE' : 'VIDEO')
+          }
+          className="hidden"
+        />
+
+        {/* 🎙️ Micrófono */}
+        <button
+          type="button"
+          onClick={recording ? stopRecording : startRecording}
+          className={`p-2 rounded-full ${recording ? 'bg-red-500' : 'bg-gray-100 hover:bg-gray-200'}`}
+          title="Grabar audio"
+        >
+          <MicrophoneIcon className="h-6 w-6 text-white" />
+        </button>
+
         <button
           type="submit"
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           Enviar
         </button>
