@@ -1,14 +1,14 @@
-// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
-import useAuth from '../hooks/useAuth'; // ✅ Importar el hook del contexto
+import useAuth from '../hooks/useAuth';
+import decodeToken from '../utils/decodeToken'; // 👈 Crear este archivo si aún no lo tenés
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ Usar login del contexto
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,25 +16,27 @@ function Login() {
 
     try {
       const res = await axiosInstance.post('/api/users/login', { email, password });
-
       const { token } = res.data;
 
       console.log('Respuesta del servidor:', res);
 
-      // ✅ Usar login del contexto para actualizar el estado global
+      // Guardar el token en el contexto
       login(token);
 
-      const me = await axiosInstance.get('/api/users/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (me.data.role === 'ADMIN') {
+      // Decodificar token para obtener el rol
+      const decoded = decodeToken(token);
+      console.log('Token decodificado:', decoded);
+
+      // Redirigir según el rol
+      if (decoded?.role === 'ADMIN') {
         navigate('/admin/chat');
       } else {
+        // Verificar si el usuario ya pagó
         try {
           const checkPago = await axiosInstance.get('/api/chat', {
             headers: { Authorization: `Bearer ${token}` },
           });
+
           if (checkPago.status === 200) {
             navigate('/chat');
           }
@@ -45,24 +47,6 @@ function Login() {
             console.error('Error verificando pago:', error);
             alert('Error inesperado al verificar el estado de pago');
           }
-        }
-      }
-      
-      // ✅ Verificamos si ya pagó
-      try {
-        const checkPago = await axiosInstance.get('/api/chat', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (checkPago.status === 200) {
-          navigate('/chat');
-        }
-      } catch (error) {
-        if (error.response?.status === 403) {
-          navigate('/pago');
-        } else {
-          console.error('Error verificando pago:', error);
-          alert('Error inesperado al verificar el estado de pago');
         }
       }
     } catch (error) {
