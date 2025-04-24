@@ -1,4 +1,3 @@
-// src/components/ChatMessages.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from '../axiosConfig';
 import ChatForm from './ChatForm';
@@ -38,7 +37,7 @@ const ChatMessages = () => {
     <div className="w-full max-w-screen-lg mx-auto p-6 flex flex-col h-[calc(100vh-130px)]">
       <div className="flex-1 overflow-y-auto space-y-4 pr-2">
         {messages.map((msg) => {
-          const isMine = msg.sender?.id === user?.id;
+          const isMine = msg.sender?.id === user?.id;  // Verifica si el mensaje es del usuario actual
 
           return (
             <div
@@ -48,8 +47,8 @@ const ChatMessages = () => {
               <div
                 className={`max-w-md md:max-w-lg lg:max-w-xl p-4 rounded-lg shadow ${
                   isMine
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-blue-100 text-blue-800'
+                    ? 'bg-green-100 text-green-800'  // Mensaje del usuario, se coloca a la derecha
+                    : 'bg-blue-100 text-blue-800'    // Mensaje del administrador, se coloca a la izquierda
                 }`}
               >
                 <p className="text-sm font-semibold mb-1">{msg.sender?.email}</p>
