@@ -19,19 +19,20 @@ const decodeToken = (token) => {
 // Proveedor del contexto de autenticación
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const [user, setUser] = useState({ nombre: '', apellido: '', email: '' });
+  const [user, setUser] = useState({ id: '', nombre: '', apellido: '', email: '', role: '' });
 
   useEffect(() => {
     if (token) {
       const decodedToken = decodeToken(token);
       setUser({
+        id: decodedToken?.id || '', // Se agrega el id al estado
         nombre: decodedToken?.nombre || '',
         apellido: decodedToken?.apellido || '',
         email: decodedToken?.email || '',
-        role: decodedToken?.role || '', // 👈 Agregado
+        role: decodedToken?.role || '', // Ahora el role se incluye también
       });
     } else {
-      setUser({ nombre: '', apellido: '', email: '', role: '' });
+      setUser({ id: '', nombre: '', apellido: '', email: '', role: '' });
     }
   }, [token]);
   
@@ -40,17 +41,18 @@ export const AuthProvider = ({ children }) => {
     setToken(newToken);
     const decodedToken = decodeToken(newToken);
     setUser({
+      id: decodedToken?.id || '', // Almacenamos el id al hacer login
       nombre: decodedToken?.nombre || '',
       apellido: decodedToken?.apellido || '',
       email: decodedToken?.email || '',
-      role: decodedToken?.role || '', // 👈 Agregado
+      role: decodedToken?.role || '', // Almacenamos el role también
     });
   };  
 
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
-    setUser({ nombre: '', apellido: '', email: '' });
+    setUser({ id: '', nombre: '', apellido: '', email: '', role: '' });
   };
 
   return (
