@@ -6,7 +6,7 @@ import useAuth from '../hooks/useAuth';
 const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
-  const { user } = useAuth();
+  const { user } = useAuth(); // ← asegurate que este user tenga `id` y `email`
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -23,24 +23,24 @@ const ChatMessages = () => {
 
   useEffect(() => {
     fetchMessages();
+
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [fetchMessages]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchMessages();
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [fetchMessages]);
-
   return (
     <div className="w-full max-w-screen-lg mx-auto p-6 flex flex-col h-[calc(100vh-130px)]">
       <div className="flex-1 overflow-y-auto space-y-4 pr-2">
         {messages.map((msg) => {
-          const isMine = msg.sender.id === user.id;
+          const isMine =
+            msg.sender.id === user?.id || msg.sender.email === user?.email;
 
           return (
             <div
