@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from '../axiosConfig';
 import ChatForm from './ChatForm';
+import { useAuth } from '../hooks/useAuth'; // Asegurate de tener este hook creado correctamente
 
 const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
+  const { user } = useAuth(); // 🔑 Traemos el user logueado
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -34,14 +36,14 @@ const ChatMessages = () => {
           <div
             key={msg.id}
             className={`flex items-start ${
-              msg.sender.email === 'drjorja@flebologia.com' ? 'justify-start' : 'justify-end'
+              msg.sender.id === user?.id ? 'justify-end' : 'justify-start'
             }`}
           >
             <div
               className={`max-w-md md:max-w-lg lg:max-w-xl p-4 rounded-lg shadow ${
-                msg.sender.email === 'drjorja@flebologia.com'
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-green-100 text-green-800'
+                msg.sender.id === user?.id
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-blue-100 text-blue-800'
               }`}
             >
               {msg.content}

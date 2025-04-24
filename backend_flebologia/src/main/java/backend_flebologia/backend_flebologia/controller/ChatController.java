@@ -2,6 +2,7 @@ package backend_flebologia.backend_flebologia.controller;
 
 import backend_flebologia.backend_flebologia.dto.ChatDTO;
 import backend_flebologia.backend_flebologia.model.ChatMessage;
+import backend_flebologia.backend_flebologia.model.Role;
 import backend_flebologia.backend_flebologia.model.User;
 import backend_flebologia.backend_flebologia.repository.UserRepository;
 import backend_flebologia.backend_flebologia.security.CustomUserDetails;
@@ -87,14 +88,20 @@ public class ChatController {
                 mediaUrl = chatMessageService.saveMediaFile(mediaFile);
             }
 
-            User doctor = userRepository.findByEmail("drjorja@flebologia.com").orElseThrow();
-            ChatMessage saved = chatMessageService.saveMessage(content, type, mediaUrl, user, doctor);
+            User doctor = userRepository.findByRole(Role.ADMIN).stream().findFirst()
+                    .orElseThrow(() -> new RuntimeException("No se encontró el doctor"));
+
+            ChatMessage saved = chatMessageService.saveMessage(
+                    content, type, mediaUrl, user, doctor
+            );
             return ResponseEntity.ok(saved);
 
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al enviar el mensaje: " + e.getMessage());
+            e.printStackTrace(); // 👈 MOSTRÁ esto en logs
+            return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/admin/usuarios")
     public ResponseEntity<?> obtenerUsuariosConChat() {
