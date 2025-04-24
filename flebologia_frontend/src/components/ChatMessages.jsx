@@ -29,7 +29,6 @@ const ChatMessages = () => {
     scrollToBottom();
   }, [messages]);
 
-  // 🕒 Actualización automática cada 3 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       fetchMessages();
@@ -39,18 +38,7 @@ const ChatMessages = () => {
 
   return (
     <div className="w-full max-w-screen-lg mx-auto p-6 flex flex-col h-[calc(100vh-130px)]">
-      {/* 🔙 Botón para volver */}
-      <button
-        onClick={() => window.history.back()}
-        className="text-blue-600 text-sm flex items-center mb-4"
-      >
-        <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-        </svg>
-        Volver
-      </button>
-
-      <div className="flex-1 overflow-y-auto space-y-4">
+      <div className="flex-1 overflow-y-auto space-y-4 pr-2">
         {messages.map((msg) => {
           const isMine = msg.sender.id === user.id;
 
