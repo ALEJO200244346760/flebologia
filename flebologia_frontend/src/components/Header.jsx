@@ -9,6 +9,8 @@ function Header() {
   const auth = useAuth() || {};
   const { user = {}, logout, token } = auth;
 
+  console.log('Datos del usuario en Header:', user); // 👀 Verificá si `role` aparece
+
   const isAdmin = user?.role === 'ADMIN';
 
   const handleLoginClick = () => {
