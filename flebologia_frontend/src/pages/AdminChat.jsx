@@ -59,8 +59,7 @@ const AdminChat = () => {
         {messages
           .filter(
             (msg) =>
-              (msg.sender.email === 'admin@flebologia.com' && msg.recipient.id == userId) ||
-              (msg.sender.id == userId && msg.recipient.email === 'admin@flebologia.com')
+              (msg.sender.id == userId || msg.recipient.id == userId)
           )
           .map((msg) => (
             <div
