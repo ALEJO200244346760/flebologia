@@ -10,6 +10,7 @@ const ChatMessages = () => {
 
   const fetchMessages = useCallback(async () => {
     try {
+      // Asegúrate de filtrar los mensajes para el usuario actual
       const response = await axios.get('/api/chat/mensajes');
       setMessages(response.data);
     } catch (error) {
@@ -51,7 +52,8 @@ const ChatMessages = () => {
                     : 'bg-blue-100 text-blue-800'    // Mensaje del administrador, se coloca a la izquierda
                 }`}
               >
-                <p className="text-sm font-semibold mb-1">{msg.sender?.email}</p>
+                {/* Mostrar el email del emisor */}
+                <p className="text-sm font-semibold mb-1">{msg.sender?.email || 'Usuario Desconocido'}</p>
                 <p>{msg.content}</p>
 
                 {msg.type === 'IMAGE' && (
