@@ -52,9 +52,9 @@ public class ChatController {
         String type = payload.get("type");
         String mediaUrl = payload.get("mediaUrl");
 
-        // El destinatario por defecto es el doctor
-        User doctor = userRepository.findByEmail("drjorja@flebologia.com").orElseThrow();
-        ChatMessage savedMessage = chatMessageService.saveMessage(content, type, mediaUrl, user, doctor);
+        // El destinatario por defecto es el administrador
+        User admin = userRepository.findByEmail("admin@flebologia.com").orElseThrow();
+        ChatMessage savedMessage = chatMessageService.saveMessage(content, type, mediaUrl, user, admin);
         return ResponseEntity.ok(savedMessage);
     }
 
@@ -88,29 +88,30 @@ public class ChatController {
                 mediaUrl = chatMessageService.saveMediaFile(mediaFile);
             }
 
-            User doctor = userRepository.findByRole(Role.ADMIN).stream().findFirst()
-                    .orElseThrow(() -> new RuntimeException("No se encontró el doctor"));
+            // El administrador para el chat es el usuario con correo "admin@flebologia.com"
+            User admin = userRepository.findByEmail("admin@flebologia.com").orElseThrow(() -> new RuntimeException("No se encontró el administrador"));
 
             ChatMessage saved = chatMessageService.saveMessage(
-                    content, type, mediaUrl, user, doctor
+                    content, type, mediaUrl, user, admin
             );
             return ResponseEntity.ok(saved);
 
         } catch (Exception e) {
-            e.printStackTrace(); // 👈 MOSTRÁ esto en logs
+            e.printStackTrace(); // 👈 Loguear esto en producción
             return ResponseEntity.status(500).body("Error interno: " + e.getMessage());
         }
     }
 
-
     @GetMapping("/admin/usuarios")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> obtenerUsuariosConChat() {
         return ResponseEntity.ok(chatMessageService.obtenerUsuariosConMensajes());
     }
 
     @GetMapping("/admin/mensajes/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<ChatMessage>> verMensajesPaciente(@PathVariable Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return ResponseEntity.ok(chatMessageService.getMessagesForUser(user));
     }
 
@@ -121,7 +122,7 @@ public class ChatController {
             @RequestBody ChatDTO dto
     ) {
         User doctor = admin.getUser();
-        User paciente = userRepository.findById(dto.getUserId()).orElseThrow();
+        User paciente = userRepository.findById(dto.getUserId()).orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
         ChatMessage msg = chatMessageService.saveMessage(
                 dto.getContent(),
@@ -133,5 +134,4 @@ public class ChatController {
 
         return ResponseEntity.ok(msg);
     }
-
 }
