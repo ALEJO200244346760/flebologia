@@ -33,7 +33,12 @@ public class UserService {
 
         userRepository.save(newUser);
 
-        return jwtUtil.generateToken(newUser.getEmail());
+        return jwtUtil.generateToken(
+                newUser.getEmail(),
+                newUser.getRole().name(),
+                newUser.getName(),
+                "" // Podés reemplazar "" por newUser.getApellido() si tenés campo apellido
+        );
     }
 
     // Login de un usuario existente
@@ -45,7 +50,12 @@ public class UserService {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name(),
+                user.getName(),
+                "" // Podés reemplazar "" por user.getApellido() si lo usás
+        );
     }
 
     // Obtener usuario por email
