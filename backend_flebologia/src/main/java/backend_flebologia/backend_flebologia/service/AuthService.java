@@ -38,10 +38,11 @@ public class AuthService {
 
         // Generar token con información adicional
         return jwtUtil.generateToken(
+                newUser.getId(),  // Ahora se pasa el ID
                 newUser.getEmail(),
-                newUser.getRole().name(), // role como string
+                newUser.getRole().name(),
                 newUser.getName(),
-                "" // apellido vacío si no lo tenés en el modelo
+                "" // Si tienes apellido, reemplázalo por newUser.getApellido()
         );
     }
 
@@ -59,10 +60,11 @@ public class AuthService {
 
         // Generar token con info adicional
         return jwtUtil.generateToken(
+                user.getId(),   // Ahora se pasa el ID
                 user.getEmail(),
                 user.getRole().name(),
                 user.getName(),
-                "" // apellido vacío
+                "" // Si tienes apellido, reemplázalo por user.getApellido()
         );
     }
 

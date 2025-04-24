@@ -34,10 +34,11 @@ public class UserService {
         userRepository.save(newUser);
 
         return jwtUtil.generateToken(
+                newUser.getId(),  // Ahora se pasa el ID
                 newUser.getEmail(),
                 newUser.getRole().name(),
                 newUser.getName(),
-                "" // Podés reemplazar "" por newUser.getApellido() si tenés campo apellido
+                "" // Si tienes apellido, reemplázalo por newUser.getApellido()
         );
     }
 
@@ -51,10 +52,11 @@ public class UserService {
         }
 
         return jwtUtil.generateToken(
+                user.getId(),   // Ahora se pasa el ID
                 user.getEmail(),
                 user.getRole().name(),
                 user.getName(),
-                "" // Podés reemplazar "" por user.getApellido() si lo usás
+                "" // Si tienes apellido, reemplázalo por user.getApellido()
         );
     }
 

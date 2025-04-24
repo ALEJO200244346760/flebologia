@@ -1,3 +1,4 @@
+// src/components/ChatMessages.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from '../axiosConfig';
 import ChatForm from './ChatForm';
@@ -6,7 +7,7 @@ import useAuth from '../hooks/useAuth';
 const ChatMessages = () => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
-  const { user } = useAuth(); // ← asegurate que este user tenga `id` y `email`
+  const { user } = useAuth();
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -23,11 +24,9 @@ const ChatMessages = () => {
 
   useEffect(() => {
     fetchMessages();
-
     const interval = setInterval(() => {
       fetchMessages();
     }, 3000);
-
     return () => clearInterval(interval);
   }, [fetchMessages]);
 
@@ -39,8 +38,7 @@ const ChatMessages = () => {
     <div className="w-full max-w-screen-lg mx-auto p-6 flex flex-col h-[calc(100vh-130px)]">
       <div className="flex-1 overflow-y-auto space-y-4 pr-2">
         {messages.map((msg) => {
-          const isMine =
-            msg.sender.id === user?.id || msg.sender.email === user?.email;
+          const isMine = msg.sender?.id === user?.id;
 
           return (
             <div
@@ -54,7 +52,7 @@ const ChatMessages = () => {
                     : 'bg-blue-100 text-blue-800'
                 }`}
               >
-                <p className="text-sm font-semibold mb-1">{msg.sender.email}</p>
+                <p className="text-sm font-semibold mb-1">{msg.sender?.email}</p>
                 <p>{msg.content}</p>
 
                 {msg.type === 'IMAGE' && (

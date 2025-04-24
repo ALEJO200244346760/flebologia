@@ -37,9 +37,11 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String email, String role, String nombre, String apellido) {
+    // Modificación del método generateToken para incluir el id
+    public String generateToken(Long id, String email, String role, String nombre, String apellido) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("id", id) // Se incluye el ID del usuario
                 .claim("role", role)
                 .claim("nombre", nombre)
                 .claim("apellido", apellido)
