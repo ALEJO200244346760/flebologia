@@ -37,11 +37,14 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String role, String nombre, String apellido) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)
+                .claim("nombre", nombre)
+                .claim("apellido", apellido)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10h
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 horas
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }

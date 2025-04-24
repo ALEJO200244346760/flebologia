@@ -36,7 +36,13 @@ public class AuthService {
 
         userRepository.save(newUser);
 
-        return jwtUtil.generateToken(newUser.getEmail());
+        // Generar token con información adicional
+        return jwtUtil.generateToken(
+                newUser.getEmail(),
+                newUser.getRole().name(), // role como string
+                newUser.getName(),
+                "" // apellido vacío si no lo tenés en el modelo
+        );
     }
 
     public String login(String email, String password) {
@@ -51,7 +57,13 @@ public class AuthService {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        // Generar token con info adicional
+        return jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name(),
+                user.getName(),
+                "" // apellido vacío
+        );
     }
 
     public User getUserFromToken(String token) {
