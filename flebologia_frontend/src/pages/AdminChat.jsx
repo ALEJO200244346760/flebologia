@@ -72,12 +72,13 @@ const AdminChat = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim() && !mediaFile) return;
-
+  
     const formData = new FormData();
+    formData.append('userId', userId); // 👈 ESTA LÍNEA ES CLAVE
     formData.append('content', content);
     formData.append('type', type);
     if (mediaFile) formData.append('media', mediaFile);
-
+  
     try {
       await axios.post('/api/chat/admin/enviar', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -89,7 +90,7 @@ const AdminChat = () => {
     } catch (err) {
       console.error('Error enviando mensaje:', err);
     }
-  };
+  };  
 
   const handleFileChange = (e, mediaType) => {
     const file = e.target.files[0];
