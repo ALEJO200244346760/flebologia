@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../axiosConfig';
-import useAuth from '../hooks/useAuth'; // 🔐 Asegurate de tener este hook
+import useAuth from '../hooks/useAuth';
 import { PaperClipIcon, MicrophoneIcon } from '@heroicons/react/24/outline';
 
 const AdminChat = () => {
@@ -32,11 +32,9 @@ const AdminChat = () => {
 
   useEffect(() => {
     fetchMessages();
-
     const interval = setInterval(() => {
       fetchMessages();
     }, 3000);
-
     return () => clearInterval(interval);
   }, [fetchMessages]);
 
@@ -44,7 +42,6 @@ const AdminChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 🎙️ INICIAR GRABACIÓN
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const recorder = new MediaRecorder(stream);
@@ -67,7 +64,6 @@ const AdminChat = () => {
     recorder.start();
   };
 
-  // 🛑 DETENER GRABACIÓN
   const stopRecording = () => {
     mediaRecorderRef.current?.stop();
     setRecording(false);
@@ -104,7 +100,7 @@ const AdminChat = () => {
   };
 
   return (
-    <div className="w-full max-w-screen-lg mx-auto p-6 flex flex-col h-[calc(100vh-130px)]">
+    <div className="w-full max-w-screen-lg mx-auto pt-6 px-6 flex flex-col h-screen">
       {/* 🔙 Botón Volver */}
       <button
         onClick={() => navigate(user?.role === 'ADMIN' ? '/admin/chat' : '/preguntero')}
@@ -118,15 +114,14 @@ const AdminChat = () => {
 
       <h2 className="text-xl font-bold mb-4">Chat con Usuario</h2>
 
+      {/* Mensajes */}
       <div className="flex-1 overflow-y-auto space-y-4 pr-2">
         {messages
           .filter(msg => msg.sender.id == userId || msg.recipient.id == userId)
           .map((msg) => (
             <div
               key={msg.id}
-              className={`flex ${
-                msg.sender.id === user?.id ? 'justify-end' : 'justify-start'
-              }`}
+              className={`flex ${msg.sender.id === user?.id ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-md md:max-w-lg lg:max-w-xl p-4 rounded-lg shadow ${
@@ -156,8 +151,11 @@ const AdminChat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Formulario similar a ChatForm */}
-      <form onSubmit={handleSubmit} className="flex items-center space-x-2 px-4 py-3 border-t border-gray-300">
+      {/* Formulario de mensaje */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center space-x-2 px-4 py-3 border-t border-gray-300 bg-white"
+      >
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -165,7 +163,6 @@ const AdminChat = () => {
           className="flex-1 resize-none p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        {/* Imagen/video */}
         <button
           type="button"
           onClick={() => fileInputRef.current.click()}
@@ -184,11 +181,12 @@ const AdminChat = () => {
           className="hidden"
         />
 
-        {/* 🎙️ Micrófono */}
         <button
           type="button"
           onClick={recording ? stopRecording : startRecording}
-          className={`p-2 rounded-full ${recording ? 'bg-red-500' : 'bg-gray-100 hover:bg-gray-200'}`}
+          className={`p-2 rounded-full ${
+            recording ? 'bg-red-500' : 'bg-gray-100 hover:bg-gray-200'
+          }`}
           title="Grabar audio"
         >
           <MicrophoneIcon className="h-6 w-6 text-white" />
