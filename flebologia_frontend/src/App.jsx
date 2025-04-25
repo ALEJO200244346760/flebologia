@@ -10,6 +10,7 @@ import Cobrar from './components/Cobrar';
 import PagoExitoso from './components/PagoExitoso';
 import AdminChat from './pages/AdminChat';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminUsuarios from './pages/AdminUsuarios';
 import { AuthProvider } from './context/AuthContext'; // 👈 importante
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
           <Route path="/admin/chat" element={<AdminDashboard />} />
           <Route path="/admin/chat/:userId" element={<AdminChat />} />
+          <Route path="/admin/usuarios" element={<AdminUsuarios />} />
         </Routes>
       </Router>
     </AuthProvider>

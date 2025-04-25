@@ -1,6 +1,7 @@
 package backend_flebologia.backend_flebologia.controller;
 
 import backend_flebologia.backend_flebologia.model.User;
+import backend_flebologia.backend_flebologia.repository.UserRepository;
 import backend_flebologia.backend_flebologia.security.CustomUserDetails;
 import backend_flebologia.backend_flebologia.service.PaymentService;
 import com.mercadopago.MercadoPagoConfig;
@@ -11,6 +12,7 @@ import com.mercadopago.resources.preference.Preference;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,7 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final UserRepository userRepository;
 
     @Value("${mercadopago.access.token}")
     private String mercadoPagoToken;
@@ -80,4 +83,16 @@ public class PaymentController {
         paymentService.marcarComoPagado(user);
         return ResponseEntity.ok(Map.of("message", "Pago confirmado correctamente"));
     }
+
+    // Revocar el pago de un usuario por ID (ADMIN)
+    @PostMapping("/revocar/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> revocarPago(@PathVariable Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.setHasPaid(false);
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Pago revocado correctamente"));
+    }
+
 }
