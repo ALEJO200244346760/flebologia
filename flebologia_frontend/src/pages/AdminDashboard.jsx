@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="p-6 relative">
+    <div className="pt-24 p-6 relative"> {/* padding top agregado para que no tape el Header */}
       {/* 👉 Botón "Usuarios" arriba a la derecha */}
       <button
         onClick={() => navigate('/admin/usuarios')}
