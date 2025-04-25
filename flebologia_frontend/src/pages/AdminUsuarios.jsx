@@ -33,6 +33,16 @@ const AdminUsuarios = () => {
     }
   };
 
+  const handleMarcarComoPagado = async (id) => {
+    try {
+      await axios.post(`/api/payment/marcar-pago/${id}`);
+      alert('Usuario marcado como pagado');
+      fetchUsuarios(); // Refrescar la lista de usuarios después de marcar como pagado
+    } catch (err) {
+      console.error('Error al marcar como pagado:', err);
+    }
+  };
+
   useEffect(() => {
     fetchUsuarios();
   }, []);
@@ -60,12 +70,21 @@ const AdminUsuarios = () => {
               <td className="p-2">{user.hasPaid ? '✅' : '❌'}</td>
               <td className="p-2">{user.role}</td>
               <td className="p-2 space-x-2">
-                <button
-                  onClick={() => handleRevocarPago(user.id)}
-                  className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
-                >
-                  Revocar Pago
-                </button>
+                {user.hasPaid ? (
+                  <button
+                    onClick={() => handleRevocarPago(user.id)}
+                    className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                  >
+                    Revocar Pago
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleMarcarComoPagado(user.id)}
+                    className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                  >
+                    Marcar como Pagado
+                  </button>
+                )}
                 <button
                   onClick={() => handleEliminar(user.id)}
                   className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"

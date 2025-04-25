@@ -94,5 +94,13 @@ public class PaymentController {
         userRepository.save(user);
         return ResponseEntity.ok(Map.of("message", "Pago revocado correctamente"));
     }
-
+    @PostMapping("/marcar-pago/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> marcarPago(@PathVariable Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.setHasPaid(true);
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Usuario marcado como pagado"));
+    }
 }
