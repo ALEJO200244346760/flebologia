@@ -24,12 +24,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       const decodedToken = decodeToken(token);
+      console.log('Token decodificado:', decodedToken); // Para verificar la información decodificada
       setUser({
         id: decodedToken?.id || '', // Se agrega el id al estado
-        nombre: decodedToken?.nombre || '',
-        apellido: decodedToken?.apellido || '',
-        email: decodedToken?.email || '',
-        role: decodedToken?.role || '', // Ahora el role se incluye también
+        nombre: decodedToken?.nombre || '', // Asignamos el nombre del token
+        apellido: decodedToken?.apellido || '', // Si no existe, dejamos vacío
+        email: decodedToken?.sub || '', // Usamos `sub` para el email (común en JWT)
+        role: decodedToken?.role || '', // Asignamos el rol
       });
     } else {
       setUser({ id: '', nombre: '', apellido: '', email: '', role: '' });
@@ -42,11 +43,11 @@ export const AuthProvider = ({ children }) => {
     const decodedToken = decodeToken(newToken);
     setUser({
       id: decodedToken?.id || '',
-      nombre: decodedToken?.name || '', // 👈 CAMBIADO
-      apellido: '', // 👈 No lo tenés, así que lo dejamos vacío
-      email: decodedToken?.email || '',
-      role: decodedToken?.role || '',
-    });    
+      nombre: decodedToken?.nombre || '', // Usamos el nombre del token
+      apellido: decodedToken?.apellido || '', // Usamos el apellido si existe
+      email: decodedToken?.sub || '', // Usamos `sub` para el email (común en JWT)
+      role: decodedToken?.role || '', // Asignamos el rol
+    });
   };  
 
   const logout = () => {
