@@ -13,9 +13,10 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="pt-28 px-6"> {/* Aumentamos el padding top */}
-      {/* 👉 Botón "Usuarios" alineado a la derecha, pero dentro del flujo */}
-      <div className="flex justify-end mb-6">
+    <div className="pt-28 px-6"> {/* Espacio para el header */}
+      {/* 👉 Título y botón alineados en una misma fila */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold">Chats de Pacientes</h2>
         <button
           onClick={() => navigate('/admin/usuarios')}
           className="bg-gray-800 text-white px-4 py-2 rounded shadow hover:bg-gray-700"
@@ -24,7 +25,6 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      <h2 className="text-xl font-bold mb-6">Chats de Pacientes</h2>
       <ul className="space-y-2">
         {usuariosConChat.map((user) => (
           <li key={user.id} className="p-4 bg-white shadow rounded flex justify-between items-center">
