@@ -41,12 +41,12 @@ export const AuthProvider = ({ children }) => {
     setToken(newToken);
     const decodedToken = decodeToken(newToken);
     setUser({
-      id: decodedToken?.id || '', // Almacenamos el id al hacer login
-      nombre: decodedToken?.nombre || '',
-      apellido: decodedToken?.apellido || '',
+      id: decodedToken?.id || '',
+      nombre: decodedToken?.name || '', // 👈 CAMBIADO
+      apellido: '', // 👈 No lo tenés, así que lo dejamos vacío
       email: decodedToken?.email || '',
-      role: decodedToken?.role || '', // Almacenamos el role también
-    });
+      role: decodedToken?.role || '',
+    });    
   };  
 
   const logout = () => {
