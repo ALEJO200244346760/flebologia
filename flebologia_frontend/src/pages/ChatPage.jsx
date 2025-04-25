@@ -11,8 +11,8 @@ const ChatPage = () => {
     <div className="flex flex-col h-screen pt-16 bg-gray-100">
       {/* 🔙 Botón Volver */}
       <button
-        onClick={() => navigate(user?.role === 'ADMIN' ? '/admin/chat' : '/preguntero')}
-        className="text-blue-500 text-sm flex items-center ml-6 mt-2"
+        onClick={() => navigate(user?.role === 'ADMIN' ? '/admin/chat' : '/')}
+        className="text-blue-500 text-sm flex items-center ml-6 mt-8"
       >
         <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
