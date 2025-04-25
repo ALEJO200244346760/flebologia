@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Map;
@@ -115,23 +116,37 @@ public class ChatController {
         return ResponseEntity.ok(chatMessageService.getMessagesForUser(user));
     }
 
-    @PostMapping("/admin/enviar")
+    @PostMapping(value = "/admin/enviar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> enviarMensajeComoDoctor(
             @AuthenticationPrincipal CustomUserDetails admin,
-            @RequestBody ChatDTO dto
+            @RequestParam("userId") Long userId,
+            @RequestParam(value = "content", required = false) String content,
+            @RequestParam("type") String type,
+            @RequestParam(value = "media", required = false) MultipartFile mediaFile
     ) {
-        User doctor = admin.getUser();
-        User paciente = userRepository.findById(dto.getUserId()).orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+        try {
+            User doctor = admin.getUser();
+            User paciente = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
 
-        ChatMessage msg = chatMessageService.saveMessage(
-                dto.getContent(),
-                dto.getType(),
-                dto.getMediaUrl(),
-                doctor,
-                paciente
-        );
+            String mediaUrl = null;
+            if (mediaFile != null && !mediaFile.isEmpty()) {
+                mediaUrl = chatMessageService.saveMediaFile(mediaFile);
+            }
 
-        return ResponseEntity.ok(msg);
+            ChatMessage msg = chatMessageService.saveMessage(
+                    content,
+                    type,
+                    mediaUrl,
+                    doctor,
+                    paciente
+            );
+
+            return ResponseEntity.ok(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error enviando mensaje: " + e.getMessage());
+        }
     }
 }
