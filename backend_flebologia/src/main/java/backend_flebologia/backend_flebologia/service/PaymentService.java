@@ -13,8 +13,8 @@ public class PaymentService {
 
     public void marcarComoPagado(User user) {
         if (user != null) {
-            user.setHasPaid(true); // Marcar como pagado
-            userRepository.save(user); // Persistir cambio en la base de datos
+            user.setHasPaid(true);
+            userRepository.save(user);
         } else {
             throw new IllegalArgumentException("Usuario no puede ser nulo");
         }
@@ -24,6 +24,16 @@ public class PaymentService {
         if (user == null) {
             throw new IllegalArgumentException("Usuario no puede ser nulo");
         }
-        return user.isHasPaid(); // Consultar flag persistente
+        return user.isHasPaid();
+    }
+
+    // ✅ Arreglado: persistir el cambio en la base de datos
+    public void revocarPago(User user) {
+        if (user != null) {
+            user.setHasPaid(false);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Usuario no puede ser nulo");
+        }
     }
 }
