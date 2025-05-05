@@ -62,11 +62,11 @@ function Preguntero() {
         <div className="flex-1 text-center md:text-left">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800 mb-4">Preguntas Frecuentes</h2>
           <ul className="text-base sm:text-lg text-gray-600 space-y-3">
-            <li>¿Qué es la flebología?</li>
+            <li>¿Qué son las varices?</li>
             <li>¿Cuáles son los síntomas más comunes?</li>
-            <li>¿Qué tratamientos existen para la flebología?</li>
+            <li>¿Qué tratamientos existen para las varices?</li>
             <li>¿Es necesario operar siempre?</li>
-            <li>¿Cómo prevenir problemas flebológicos?</li>
+            <li>¿Cómo prevenir varices?</li>
           </ul>
         </div>
 
